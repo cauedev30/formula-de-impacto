@@ -28,6 +28,43 @@
   box-sizing: border-box;
 }
 
+/* Item de grid e de flex tem `min-width: auto` e nao encolhe abaixo da largura intrinseca
+   do conteudo: um input sem `size` mede 20 caracteres e estoura a tela no Safari, que
+   respeita essa medida. O Chromium nao, entao o estouro so aparece no aparelho. */
+.conteudo *,
+.topo > *,
+.rodape > * {
+  min-width: 0;
+}
+
+input,
+textarea,
+select,
+img,
+video,
+audio,
+table {
+  max-width: 100%;
+}
+
+/* Nome de comunidade ou de entrevistado sem espaco nao pode empurrar a tela. */
+p,
+li,
+td,
+th,
+h1,
+h2,
+label,
+.enunciado,
+.opcao {
+  overflow-wrap: break-word;
+}
+
+html,
+body {
+  overflow-x: clip;
+}
+
 html {
   -webkit-text-size-adjust: 100%;
 }
@@ -594,8 +631,11 @@ textarea {
 
 /* Codigo digitado com o polegar, no sol: numero grande e espacado, nao campo de senha. */
 input.pin {
-  font-size: 30px;
-  letter-spacing: 0.5em;
+  width: 100%;
+  font-size: 28px;
+  /* Espaco depois do ultimo digito desloca o texto centralizado; o recuo compensa. */
+  letter-spacing: 0.4em;
+  text-indent: 0.4em;
   text-align: center;
   padding: 12px;
   font-variant-numeric: tabular-nums;

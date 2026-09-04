@@ -125,6 +125,7 @@ export default function Tranca({ children }) {
               inputMode="numeric"
               autoComplete={cadastro ? "new-password" : "current-password"}
               className="pin"
+              size={TAMANHO}
               maxLength={TAMANHO}
               value={pin}
               onChange={(e) => {
@@ -144,6 +145,7 @@ export default function Tranca({ children }) {
                   inputMode="numeric"
                   autoComplete="new-password"
                   className="pin"
+                  size={TAMANHO}
                   maxLength={TAMANHO}
                   value={confirmacao}
                   onChange={(e) => setConfirmacao(e.target.value.replace(/\D/g, ""))}

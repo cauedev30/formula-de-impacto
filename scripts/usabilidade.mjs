@@ -16,6 +16,8 @@ const DEVICES = [
   { nome: "galaxy-a-360", largura: 360, altura: 800, escala: 3, movel: true },
   { nome: "iphone-se-375", largura: 375, altura: 667, escala: 2, movel: true },
   { nome: "iphone-15-393", largura: 393, altura: 852, escala: 3, movel: true },
+  { nome: "iphone-11-414", largura: 414, altura: 896, escala: 2, movel: true },
+  { nome: "iphone-16-pro-max-440", largura: 440, altura: 956, escala: 3, movel: true },
   { nome: "pixel-8-412", largura: 412, altura: 915, escala: 2.625, movel: true },
   { nome: "ipad-mini-744", largura: 744, altura: 1133, escala: 2, movel: true },
   { nome: "tablet-android-800", largura: 800, altura: 1280, escala: 2, movel: true },
@@ -119,6 +121,31 @@ const AUDITORIA = `
         detalhe: contraste.toFixed(2) + ":1 (piso " + piso + ")",
         texto: el.textContent.trim().slice(0, 40),
       });
+    }
+  }
+
+  // O Safari respeita o min-width auto de item de grid e de flex: um filho cuja largura
+  // intrinseca passa do espaco disponivel empurra a tela inteira. O Chromium encolhe e
+  // esconde o defeito, entao a medicao aqui nao pode depender do que foi renderizado.
+  for (const caixa of document.querySelectorAll("*")) {
+    const layout = getComputedStyle(caixa).display;
+    if (!/grid|flex/.test(layout)) continue;
+    const espaco = caixa.clientWidth;
+    if (!espaco) continue;
+    for (const filho of caixa.children) {
+      if (!visivel(filho)) continue;
+      if (getComputedStyle(filho).minWidth !== "auto") continue;
+      const largura = filho.style.width;
+      filho.style.width = "max-content";
+      const intrinseca = filho.getBoundingClientRect().width;
+      filho.style.width = largura;
+      if (intrinseca > espaco + 1) {
+        achados.push({
+          tipo: "estoura-no-safari",
+          detalhe: Math.round(intrinseca) + "px em " + espaco + "px",
+          texto: (filho.id || filho.className || filho.tagName).toString().slice(0, 40),
+        });
+      }
     }
   }
 
