@@ -40,6 +40,7 @@ export default function Inicio() {
   const [entrevistas, setEntrevistas] = useState([]);
   const [exportando, setExportando] = useState(false);
   const [paraApagar, setParaApagar] = useState(null);
+  const [falha, setFalha] = useState("");
 
   useEffect(() => {
     listarEntrevistas().then(setEntrevistas);
@@ -71,14 +72,24 @@ export default function Inicio() {
       iniciadaEm: new Date().toISOString(),
       concluidaEm: null,
     };
-    await salvarEntrevista(entrevista);
+    try {
+      await salvarEntrevista(entrevista);
+    } catch {
+      // Sem isto o botão simplesmente não responde e ele fica clicando na frente do
+      // entrevistado, sem saber que o aparelho não conseguiu guardar nada.
+      return setFalha("Não consegui guardar no aparelho. Feche e abra o app; se continuar, libere o armazenamento para este site.");
+    }
     router.push(`/entrevista/?id=${entrevista.id}`);
   }
 
   async function apagar(id) {
-    await apagarEntrevista(id);
+    try {
+      await apagarEntrevista(id);
+      setEntrevistas(await listarEntrevistas());
+    } catch {
+      setFalha("Não consegui apagar agora. Tente de novo.");
+    }
     setParaApagar(null);
-    setEntrevistas(await listarEntrevistas());
   }
 
   async function exportar() {
@@ -142,6 +153,8 @@ export default function Inicio() {
             />
           </>
         )}
+
+        {falha && <p className="aviso">{falha}</p>}
 
         {completo && (
           <p className="selo">

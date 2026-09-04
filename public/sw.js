@@ -1,8 +1,7 @@
-const CACHE = "formula-de-impacto-v3";
+const CACHE = "formula-de-impacto-v4";
 const ROTAS = ["/", "/entrevista/", "/relatorio/", "/consolidado/", "/manifest.webmanifest"];
 
-// Uma rota por vez, e falha de uma não derruba as outras: `addAll` é tudo-ou-nada, então
-// uma única URL renomeada deixaria o app sem service worker nenhum, sem erro visível.
+// Uma rota por vez: `addAll` é tudo-ou-nada e uma URL renomeada deixaria o app sem SW nenhum.
 self.addEventListener("install", (evento) => {
   evento.waitUntil(
     caches
@@ -21,33 +20,35 @@ self.addEventListener("activate", (evento) => {
   );
 });
 
+const guardar = (request, resposta) => {
+  if (resposta?.ok) {
+    const copia = resposta.clone();
+    caches.open(CACHE).then((cache) => cache.put(request, copia));
+  }
+  return resposta;
+};
+
 self.addEventListener("fetch", (evento) => {
   const { request } = evento;
   if (request.method !== "GET" || new URL(request.url).origin !== self.location.origin) return;
 
-  // Navegação nunca pode terminar em tela de erro: sem rede e sem a rota no cache,
-  // a home responde e o app continua de pé — é onde o entrevistador está, no meio do mato.
-  if (request.mode === "navigate") {
+  // Nome com hash nunca muda de conteúdo.
+  if (request.url.includes("/_next/static/")) {
     evento.respondWith(
-      caches
-        .match(request, { ignoreSearch: true })
-        .then((achado) => achado ?? fetch(request))
-        .catch(() => caches.match("/")),
+      caches.match(request).then((achado) => achado ?? fetch(request).then((r) => guardar(request, r))),
     );
     return;
   }
 
+  // Rede primeiro: cache-first no HTML servia o app shell antigo para sempre, e o aparelho
+  // em campo nunca receberia correção. O cache responde quando não há sinal.
   evento.respondWith(
-    caches.match(request).then(
-      (achado) =>
-        achado ??
-        fetch(request).then((resposta) => {
-          if (resposta.ok) {
-            const copia = resposta.clone();
-            caches.open(CACHE).then((cache) => cache.put(request, copia));
-          }
-          return resposta;
-        }),
-    ),
+    fetch(request)
+      .then((resposta) => guardar(request, resposta))
+      .catch(() =>
+        caches
+          .match(request, { ignoreSearch: true })
+          .then((achado) => achado ?? (request.mode === "navigate" ? caches.match("/") : undefined)),
+      ),
   );
 });
