@@ -1,0 +1,16 @@
+{
+  "name": "CAIXA Fórmula de Impacto",
+  "short_name": "Fórmula de Impacto",
+  "description": "Dados, pessoas e sustentabilidade: diagnóstico territorial que funciona sem sinal",
+  "start_url": "/",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#edf1f6",
+  "theme_color": "#0054a2",
+  "lang": "pt-BR",
+  "icons": [
+    { "src": "/icone-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
+    { "src": "/icone-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any" },
+    { "src": "/icone-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
+  ]
+}

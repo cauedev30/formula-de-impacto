@@ -1,0 +1,18 @@
+# O service worker precisa ser rebuscado a cada visita: se ele ficar em cache,
+# o tablet trava numa versão antiga do app e não existe forma de atualizar.
+/sw.js
+  Cache-Control: no-cache
+  Service-Worker-Allowed: /
+
+/manifest.webmanifest
+  Cache-Control: no-cache
+
+# Nome com hash: o conteúdo nunca muda para a mesma URL.
+/_next/static/*
+  Cache-Control: public, max-age=31536000, immutable
+
+/*
+  X-Content-Type-Options: nosniff
+  Referrer-Policy: strict-origin-when-cross-origin
+  # O gravador precisa do microfone; nada mais é liberado.
+  Permissions-Policy: microphone=(self), camera=(), geolocation=()

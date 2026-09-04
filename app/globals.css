@@ -1,0 +1,602 @@
+:root {
+  /* Amostradas do logo: azul do fundo, laranja da face do cubo, dourado das barras
+     de crescimento, verde da folha. Os tres eixos da marca sao os tres papeis da tela. */
+  --azul: #0054a2;
+  --azul-fundo: #003f7d;
+  --azul-tinta: #0a2a47;
+  --azul-veu: #e2edf9;
+  --laranja: #f0900c;
+  --laranja-fundo: #c77607;
+  --laranja-tinta: #1f1300;
+  --dourado: #e4ae2a;
+  --dourado-veu: #fcf2d9;
+  /* O verde da folha do logo da 4,29:1 e nao serve para texto. Ele fica nas superficies
+     (barra de progresso, borda) e o tom escuro carrega o texto, com 5,45:1. */
+  --verde: #396c24;
+  --verde-superficie: #427e2a;
+  --verde-veu: #e9f2e0;
+  --papel: #ffffff;
+  --fundo: #edf1f6;
+  --borda: #b7c7d8;
+  --borda-forte: #6c87a2;
+  --alvo: 64px;
+  --raio: 10px;
+  color-scheme: light;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html {
+  -webkit-text-size-adjust: 100%;
+}
+
+body {
+  margin: 0;
+  /* O azul da marca e o plano de fundo do app, nao um bloco dentro dele. O conteudo
+     sobe como folha branca por cima: e o que faz a marca deixar de parecer adesivo. */
+  background: var(--azul);
+  color: var(--azul-tinta);
+  font-family: var(--fonte), system-ui, sans-serif;
+  font-size: 18px;
+  line-height: 1.5;
+}
+
+/* Sol aberto lava sombra e cinza-claro. Toda separação aqui é borda sólida ou
+   diferença de fundo — nada que dependa de brilho da tela para existir. */
+.cartao {
+  background: var(--papel);
+  border: 2px solid var(--borda);
+  border-radius: var(--raio);
+  padding: 20px;
+}
+
+.topo {
+  position: sticky;
+  top: 0;
+  gap: 14px;
+  z-index: 10;
+  background: var(--azul);
+  color: #fff;
+  padding: 14px 20px;
+  border: none;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+.topo h1 {
+  font-size: 19px;
+  font-weight: 700;
+  margin: 0;
+  letter-spacing: -0.01em;
+}
+
+.marca {
+  width: 48px;
+  height: 48px;
+  flex: none;
+  border-radius: 8px;
+  background: var(--papel);
+  display: grid;
+  place-items: center;
+  font-weight: 800;
+  color: var(--azul);
+  font-size: 20px;
+}
+
+.folha {
+  background: var(--fundo);
+  border-radius: 22px 22px 0 0;
+  min-height: 60vh;
+  padding-top: 6px;
+}
+
+.conteudo {
+  max-width: 780px;
+  margin: 0 auto;
+  padding: 20px 16px 220px;
+  display: grid;
+  gap: 18px;
+}
+
+/* Marca no azul, antes da folha branca: aparece uma vez, no alto, e sai de cena
+   assim que a primeira entrevista existe. */
+.marca-abertura {
+  text-align: center;
+  padding: 8px 20px 30px;
+}
+
+body:has(.marca-abertura) .topo {
+  position: static;
+}
+
+.marca-abertura img {
+  display: block;
+  width: 100%;
+  max-width: 196px;
+  height: auto;
+  margin: 0 auto;
+}
+
+.marca-abertura .promessa {
+  margin: 14px auto 0;
+  max-width: 36ch;
+  font-size: 15px;
+  color: #cfe0f2;
+}
+
+h2.secao {
+  font-size: 14px;
+  font-weight: 800;
+  letter-spacing: 0.09em;
+  text-transform: uppercase;
+  color: var(--azul);
+  margin: 22px 0 2px;
+  padding-bottom: 8px;
+  border-bottom: 3px solid var(--azul);
+}
+
+.enunciado {
+  font-size: 21px;
+  font-weight: 600;
+  line-height: 1.35;
+  margin: 0 0 16px;
+}
+
+.numero {
+  color: var(--borda-forte);
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  margin-right: 8px;
+}
+
+.opcoes {
+  display: grid;
+  gap: 10px;
+}
+
+.opcao {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  min-height: var(--alvo);
+  padding: 12px 16px;
+  background: var(--papel);
+  border: 2px solid var(--borda);
+  border-radius: var(--raio);
+  font: inherit;
+  color: inherit;
+  text-align: left;
+  cursor: pointer;
+  width: 100%;
+}
+
+.opcao:active {
+  background: var(--azul-veu);
+}
+
+.opcao[aria-pressed="true"] {
+  border-color: var(--azul);
+  border-width: 3px;
+  background: var(--azul-veu);
+  font-weight: 600;
+}
+
+.marcador {
+  width: 26px;
+  height: 26px;
+  flex: none;
+  border: 3px solid var(--borda-forte);
+  background: var(--papel);
+}
+
+.marcador.redondo {
+  border-radius: 50%;
+}
+
+.opcao[aria-pressed="true"] .marcador {
+  border-color: var(--azul);
+  background: var(--azul);
+  box-shadow: inset 0 0 0 4px var(--papel);
+}
+
+.escala {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 8px;
+}
+
+.escala .opcao {
+  flex-direction: column;
+  justify-content: center;
+  gap: 6px;
+  padding: 10px 6px;
+  text-align: center;
+  font-size: 14px;
+  line-height: 1.2;
+}
+
+.escala .grau {
+  font-size: 24px;
+  font-weight: 800;
+  font-variant-numeric: tabular-nums;
+}
+
+input[type="text"],
+input[type="number"],
+textarea {
+  width: 100%;
+  min-height: var(--alvo);
+  padding: 14px 16px;
+  font: inherit;
+  color: inherit;
+  background: var(--papel);
+  border: 2px solid var(--borda);
+  border-radius: var(--raio);
+}
+
+textarea {
+  min-height: 110px;
+  resize: vertical;
+}
+
+:focus-visible {
+  outline: 4px solid var(--laranja);
+  outline-offset: 2px;
+}
+
+/* Laranja é 2,2:1 contra branco: só vive como superfície, com rótulo escuro em cima. */
+.botao {
+  min-height: var(--alvo);
+  padding: 0 24px;
+  border: none;
+  border-radius: var(--raio);
+  background: var(--laranja);
+  color: var(--laranja-tinta);
+  font: inherit;
+  font-weight: 700;
+  font-size: 18px;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+}
+
+.botao:active {
+  background: var(--laranja-fundo);
+}
+
+.botao[disabled] {
+  background: #c9d6e2;
+  color: #2f3d49;
+  cursor: not-allowed;
+}
+
+.botao.secundario {
+  background: var(--papel);
+  color: var(--azul);
+  border: 2px solid var(--azul);
+}
+
+.botao.gravando {
+  background: #b3271a;
+  color: #fff;
+}
+
+/* Barra de ação no rodapé: o polegar alcança a base da tela, não o topo. */
+.rodape {
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: var(--papel);
+  border-top: 3px solid var(--azul);
+  padding: 12px 16px calc(12px + env(safe-area-inset-bottom));
+  display: flex;
+  gap: 12px;
+  align-items: center;
+}
+
+.rodape .botao {
+  flex: 1;
+}
+
+.progresso {
+  flex: none;
+  min-width: 92px;
+  font-variant-numeric: tabular-nums;
+  font-weight: 700;
+  color: var(--verde);
+}
+
+.trilho {
+  height: 8px;
+  background: var(--borda);
+  border-radius: 99px;
+  overflow: hidden;
+}
+
+.trilho span {
+  display: block;
+  height: 100%;
+  background: var(--verde-superficie);
+}
+
+.selo {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 4px 12px;
+  border-radius: 99px;
+  background: var(--verde-veu);
+  color: var(--verde);
+  font-size: 14px;
+  font-weight: 700;
+  border: 2px solid var(--verde);
+}
+
+.aviso {
+  padding: 14px 16px;
+  border-radius: var(--raio);
+  border: 2px solid var(--laranja);
+  background: #fff6e6;
+  color: var(--laranja-tinta);
+  font-weight: 600;
+}
+
+.lista {
+  display: grid;
+  gap: 10px;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.item {
+  background: var(--papel);
+  border: 2px solid var(--borda);
+  border-radius: var(--raio);
+  overflow: hidden;
+}
+
+.item > a {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+  min-height: var(--alvo);
+  padding: 14px 16px;
+  color: inherit;
+  text-decoration: none;
+}
+
+.item > a:active {
+  background: var(--azul-veu);
+}
+
+/* Ações separadas do corpo por borda: apagar entrevista é irreversível e não pode
+   ficar a um deslize do polegar da área que só abre a entrevista. */
+.acoes {
+  display: flex;
+  border-top: 2px solid var(--borda);
+}
+
+.acoes > * {
+  flex: 1;
+  min-height: 52px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  background: none;
+  border: none;
+  border-left: 2px solid var(--borda);
+  font: inherit;
+  font-weight: 600;
+  font-size: 16px;
+  color: var(--azul);
+  text-decoration: none;
+  cursor: pointer;
+}
+
+.acoes > *:first-child {
+  border-left: none;
+}
+
+.acoes .perigo {
+  color: #a51c0d;
+}
+
+.acoes .perigo[data-armado="true"] {
+  background: #a51c0d;
+  color: #fff;
+}
+
+.discreto {
+  color: #4d6274;
+  font-size: 15px;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+th,
+td {
+  text-align: left;
+  padding: 10px 12px;
+  border-bottom: 2px solid var(--borda);
+  vertical-align: top;
+}
+
+td.n {
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+@media print {
+  .topo,
+  .rodape,
+  .nao-imprime {
+    display: none !important;
+  }
+
+  body {
+    background: #fff;
+    font-size: 11pt;
+  }
+
+  .conteudo {
+    max-width: none;
+    padding: 0;
+    gap: 10px;
+  }
+
+  .cartao {
+    border: 1px solid #999;
+    padding: 10px;
+    break-inside: avoid;
+  }
+
+  h2.secao {
+    break-after: avoid;
+  }
+}
+
+/* Cinco colunas em 360px dão alvos de 40px — abaixo do mínimo de toque. Numa tela
+   estreita a escala vira lista: perde a metáfora de régua, ganha o dedo acertando. */
+@media (max-width: 430px) {
+  .escala {
+    grid-template-columns: 1fr;
+  }
+
+  .escala .opcao {
+    flex-direction: row;
+    justify-content: flex-start;
+    gap: 14px;
+    padding: 12px 16px;
+    text-align: left;
+    font-size: 17px;
+  }
+
+  .escala .grau {
+    font-size: 20px;
+    min-width: 26px;
+  }
+}
+
+/* Superficies que o navegador desenha sozinho e que denunciam pagina montada em vez
+   de projetada: selecao, cursor de texto e barra de rolagem entram na paleta. */
+::selection {
+  background: var(--azul-veu);
+  color: var(--azul-tinta);
+}
+
+input,
+textarea {
+  caret-color: var(--laranja);
+}
+
+* {
+  scrollbar-color: var(--borda-forte) var(--fundo);
+  scrollbar-width: thin;
+}
+
+.marca-topo {
+  width: 48px;
+  height: 48px;
+  flex: none;
+  border-radius: 9px;
+  display: block;
+}
+
+.topo h1 b {
+  font-weight: 700;
+  letter-spacing: 0.01em;
+}
+
+
+
+
+
+
+
+
+
+
+/* Barras do consolidado herdam o dourado das barras de crescimento do logo:
+   dado contado tem cor propria, separada do verde de "respondido". */
+.trilho.dados span {
+  background: var(--dourado);
+}
+
+.icone {
+  flex: none;
+  display: block;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .selo-feito {
+    animation: surgir 240ms cubic-bezier(0.2, 0.9, 0.3, 1);
+  }
+}
+
+@keyframes surgir {
+  from {
+    opacity: 0;
+    transform: scale(0.7);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+.processando {
+  padding: 14px 16px;
+  border: 2px solid var(--dourado);
+  background: var(--dourado-veu);
+  border-radius: var(--raio);
+}
+
+.promessa {
+  margin: 16px auto 0;
+  padding-top: 14px;
+  border-top: 1px solid rgba(255, 255, 255, 0.24);
+  max-width: 34ch;
+  font-size: 15px;
+  color: #d5e4f4;
+}
+
+.marca-abertura + .folha .conteudo > .cartao:first-child {
+  border-color: var(--borda);
+}
+
+@media (min-width: 620px) {
+  .marca-abertura img {
+    max-width: 224px;
+  }
+}
+
+.rotulo {
+  display: block;
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--azul-tinta);
+  margin: 16px 0 7px;
+}
+
+/* Codigo digitado com o polegar, no sol: numero grande e espacado, nao campo de senha. */
+input.pin {
+  font-size: 30px;
+  letter-spacing: 0.5em;
+  text-align: center;
+  padding: 12px;
+  font-variant-numeric: tabular-nums;
+}

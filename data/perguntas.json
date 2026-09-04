@@ -1,0 +1,463 @@
+{
+  "versao": "1",
+  "perguntas": [
+    {
+      "id": "nome",
+      "secao": "Identificação",
+      "texto": "Nome do entrevistado",
+      "tipo": "texto"
+    },
+    {
+      "id": "comunidade",
+      "secao": "Identificação",
+      "texto": "Comunidade ou localidade",
+      "tipo": "texto"
+    },
+    {
+      "id": "idade",
+      "secao": "Identificação",
+      "texto": "Idade",
+      "tipo": "numero"
+    },
+    {
+      "id": "tempo_no_territorio",
+      "secao": "Identificação",
+      "texto": "Há quanto tempo vive neste território?",
+      "tipo": "unica",
+      "opcoes": ["Nasci aqui", "Mais de 15 anos", "De 6 a 15 anos", "De 1 a 5 anos", "Menos de 1 ano"]
+    },
+
+    {
+      "id": "qualidade_de_vida",
+      "secao": "Território",
+      "texto": "Como você avalia a qualidade de vida no território hoje?",
+      "tipo": "escala",
+      "opcoes": ["Muito ruim", "Ruim", "Regular", "Boa", "Muito boa"]
+    },
+    {
+      "id": "maiores_faltas",
+      "secao": "Território",
+      "texto": "O que mais falta aqui? (marque até 3)",
+      "tipo": "multipla",
+      "maximo": 3,
+      "opcoes": [
+        "Água", "Estrada", "Saúde", "Educação", "Transporte", "Energia",
+        "Internet", "Assistência técnica", "Crédito", "Saneamento", "Lazer e cultura"
+      ]
+    },
+    {
+      "id": "participa_organizacao",
+      "secao": "Território",
+      "texto": "Participa de associação, cooperativa ou sindicato?",
+      "tipo": "unica",
+      "opcoes": ["Sim, ativamente", "Sim, mas pouco", "Não participo", "Não existe aqui"]
+    },
+
+    {
+      "id": "producao_itens",
+      "secao": "Produção",
+      "texto": "O que você produz?",
+      "tipo": "multipla",
+      "opcoes": [
+        "Lavoura de subsistência", "Hortaliças", "Frutas", "Mandioca e derivados",
+        "Criação de pequenos animais", "Gado", "Leite e derivados", "Mel",
+        "Pesca", "Extrativismo", "Artesanato"
+      ],
+      "quando": { "categoria": ["agricultor", "quilombola", "assentado"] }
+    },
+    {
+      "id": "destino_producao",
+      "secao": "Produção",
+      "texto": "A produção é para consumo próprio, para venda, ou os dois?",
+      "tipo": "unica",
+      "opcoes": ["Só consumo próprio", "Mais consumo que venda", "Mais venda que consumo", "Só venda"],
+      "quando": { "categoria": ["agricultor", "quilombola", "assentado"] }
+    },
+    {
+      "id": "escoamento",
+      "secao": "Produção",
+      "texto": "Você consegue escoar toda a produção?",
+      "tipo": "unica",
+      "opcoes": ["Sim, toda", "Só uma parte", "Não consigo escoar"],
+      "quando": { "categoria": ["agricultor", "quilombola", "assentado"] }
+    },
+    {
+      "id": "escoamento_obstaculo",
+      "secao": "Produção",
+      "texto": "O que impede escoar a produção?",
+      "tipo": "multipla",
+      "opcoes": [
+        "Estrada ruim", "Falta de transporte", "Preço baixo demais", "Falta de comprador",
+        "Não tem onde armazenar", "Perde antes de vender", "Falta de documentação"
+      ],
+      "quando": { "categoria": ["agricultor", "quilombola", "assentado"] },
+      "se": { "pergunta": "escoamento", "responder": ["Só uma parte", "Não consigo escoar"] }
+    },
+    {
+      "id": "canais_venda",
+      "secao": "Produção",
+      "texto": "Onde vende o que produz?",
+      "tipo": "multipla",
+      "opcoes": [
+        "Feira livre", "Atravessador", "PNAE (merenda escolar)", "PAA",
+        "Direto ao consumidor", "Cooperativa ou associação", "Mercado local"
+      ],
+      "quando": { "categoria": ["agricultor", "quilombola", "assentado"] },
+      "se": { "pergunta": "destino_producao", "responder": ["Mais consumo que venda", "Mais venda que consumo", "Só venda"] }
+    },
+    {
+      "id": "assistencia_tecnica",
+      "secao": "Produção",
+      "texto": "Recebe assistência técnica?",
+      "tipo": "unica",
+      "opcoes": ["Sim, com regularidade", "Só de vez em quando", "Já recebi, hoje não", "Nunca recebi"],
+      "quando": { "categoria": ["agricultor", "quilombola", "assentado"] }
+    },
+    {
+      "id": "credito_rural",
+      "secao": "Produção",
+      "texto": "Já acessou crédito rural (Pronaf ou outro)?",
+      "tipo": "unica",
+      "opcoes": ["Sim, tenho hoje", "Já tive, quitei", "Tentei e não consegui", "Nunca tentei"],
+      "quando": { "categoria": ["agricultor", "quilombola", "assentado"] }
+    },
+    {
+      "id": "agua_producao",
+      "secao": "Sustentabilidade",
+      "texto": "Tem água suficiente para a produção o ano todo?",
+      "tipo": "unica",
+      "opcoes": ["Sim, o ano todo", "Falta na estiagem", "Falta boa parte do ano", "Não tenho água para produzir"],
+      "quando": { "categoria": ["agricultor", "quilombola", "assentado"] }
+    },
+    {
+      "id": "praticas_conservacao",
+      "secao": "Sustentabilidade",
+      "texto": "Usa alguma dessas práticas na propriedade?",
+      "tipo": "multipla",
+      "opcoes": [
+        "Cisterna ou reuso de água", "Adubação orgânica", "Rotação de culturas",
+        "Sistema agroflorestal", "Proteção de nascente", "Quebra-vento ou cordão vegetado",
+        "Nenhuma delas"
+      ],
+      "quando": { "categoria": ["agricultor", "quilombola", "assentado"] }
+    },
+    {
+      "id": "documento_produtor",
+      "secao": "Produção",
+      "texto": "Tem DAP ou CAF (declaração de aptidão ao Pronaf)?",
+      "tipo": "unica",
+      "opcoes": ["Sim, ativa", "Tenho, mas está vencida", "Não tenho", "Não sei o que é"],
+      "quando": { "categoria": ["agricultor", "quilombola", "assentado"] }
+    },
+    {
+      "id": "mao_de_obra",
+      "secao": "Produção",
+      "texto": "Quem trabalha na produção?",
+      "tipo": "multipla",
+      "opcoes": [
+        "Só eu", "Meu cônjuge", "Filhos e filhas", "Outros parentes",
+        "Diarista contratado", "Mutirão ou troca de dia"
+      ],
+      "quando": { "categoria": ["agricultor", "quilombola", "assentado"] }
+    },
+    {
+      "id": "infraestrutura_propriedade",
+      "secao": "Produção",
+      "texto": "O que a propriedade tem hoje?",
+      "tipo": "multipla",
+      "opcoes": [
+        "Energia elétrica", "Poço ou cisterna", "Galpão ou depósito", "Câmara fria",
+        "Trator ou implemento", "Veículo para transporte", "Internet", "Nada disso"
+      ],
+      "quando": { "categoria": ["agricultor", "quilombola", "assentado"] }
+    },
+    {
+      "id": "melhoria_renda",
+      "secao": "Sustentabilidade",
+      "texto": "O que precisaria acontecer para a sua renda melhorar?",
+      "tipo": "audio",
+      "quando": { "categoria": ["agricultor", "quilombola", "assentado"] }
+    },
+
+    {
+      "id": "renda_propria",
+      "secao": "Mulher no território",
+      "texto": "Você tem renda própria?",
+      "tipo": "unica",
+      "opcoes": ["Sim, da produção", "Sim, de outro trabalho", "Só benefício ou aposentadoria", "Não tenho renda própria"],
+      "quando": { "categoria": ["agricultor", "quilombola", "assentado"], "genero": ["feminino"], "faixa": ["adulto"] }
+    },
+    {
+      "id": "trabalho_reconhecido",
+      "secao": "Mulher no território",
+      "texto": "Seu trabalho na produção aparece nos documentos da propriedade (DAP/CAF, bloco de produtor)?",
+      "tipo": "unica",
+      "opcoes": ["Sim, em meu nome", "Está só no nome do homem", "Não temos documento", "Não sei"],
+      "quando": { "categoria": ["agricultor", "quilombola", "assentado"], "genero": ["feminino"], "faixa": ["adulto"] }
+    },
+
+    {
+      "id": "quilombo_certificacao",
+      "secao": "Território tradicional",
+      "texto": "A comunidade é certificada pela Fundação Palmares?",
+      "tipo": "unica",
+      "opcoes": ["Sim, certificada", "Em processo", "Não certificada", "Não sei"],
+      "quando": { "categoria": ["quilombola"] }
+    },
+    {
+      "id": "quilombo_titulacao",
+      "secao": "Território tradicional",
+      "texto": "O território já foi titulado?",
+      "tipo": "unica",
+      "opcoes": ["Titulado", "Em processo no INCRA", "Não titulado", "Não sei"],
+      "quando": { "categoria": ["quilombola"] }
+    },
+    {
+      "id": "assentamento_nome",
+      "secao": "Território tradicional",
+      "texto": "Nome do assentamento",
+      "tipo": "texto",
+      "quando": { "categoria": ["assentado"] }
+    },
+    {
+      "id": "assentamento_documento",
+      "secao": "Território tradicional",
+      "texto": "Qual documento você tem do lote?",
+      "tipo": "unica",
+      "opcoes": ["Título definitivo", "CCU (concessão de uso)", "Só a relação de beneficiários", "Nenhum documento"],
+      "quando": { "categoria": ["assentado"] }
+    },
+
+    {
+      "id": "jovem_estuda",
+      "secao": "Juventude",
+      "texto": "Você estuda atualmente?",
+      "tipo": "unica",
+      "opcoes": ["Ensino médio", "Ensino técnico", "Faculdade", "EJA", "Parei de estudar", "Já terminei"],
+      "quando": { "faixa": ["jovem"] }
+    },
+    {
+      "id": "jovem_permanencia",
+      "secao": "Juventude",
+      "texto": "Depois de terminar o ensino médio, você pretende continuar morando na zona rural?",
+      "tipo": "unica",
+      "opcoes": ["Sim, quero ficar", "Quero sair e voltar depois", "Quero sair de vez", "Ainda não sei"],
+      "quando": { "faixa": ["jovem"] }
+    },
+    {
+      "id": "jovem_atividade_rural",
+      "secao": "Juventude",
+      "texto": "Pretende continuar trabalhando com atividade rural?",
+      "tipo": "unica",
+      "opcoes": ["Sim", "Só como complemento de renda", "Não", "Ainda não sei"],
+      "quando": { "faixa": ["jovem"] }
+    },
+    {
+      "id": "jovem_estimulo",
+      "secao": "Juventude",
+      "texto": "O que faria você querer ficar e trabalhar aqui? (marque até 3)",
+      "tipo": "multipla",
+      "maximo": 3,
+      "opcoes": [
+        "Renda melhor", "Terra própria", "Acesso a crédito para jovem", "Internet boa",
+        "Continuar estudando sem sair", "Transporte", "Assistência técnica",
+        "Lazer e cultura", "Ser ouvido nas decisões da comunidade"
+      ],
+      "quando": { "faixa": ["jovem"] }
+    },
+    {
+      "id": "jovem_uma_mudanca",
+      "secao": "Juventude",
+      "texto": "Se você pudesse mudar uma coisa para ficar, o que seria?",
+      "tipo": "audio",
+      "quando": { "faixa": ["jovem"] }
+    },
+
+    {
+      "id": "adulto_sucessao",
+      "secao": "Sucessão",
+      "texto": "Os jovens da sua família pretendem continuar no campo?",
+      "tipo": "unica",
+      "opcoes": ["Sim, todos", "Alguns sim", "Nenhum", "Não tenho jovens em casa"],
+      "quando": { "faixa": ["adulto"], "categoria": ["agricultor", "quilombola", "assentado"] }
+    },
+    {
+      "id": "adulto_o_que_falta",
+      "secao": "Sucessão",
+      "texto": "O que falta para melhorar a sua qualidade de vida aqui?",
+      "tipo": "audio",
+      "quando": { "faixa": ["adulto"], "categoria": ["agricultor", "quilombola", "assentado"] }
+    },
+
+    {
+      "id": "gestao_politica_rural",
+      "secao": "Gestão pública",
+      "texto": "O município tem plano ou política para o desenvolvimento rural?",
+      "tipo": "unica",
+      "opcoes": ["Sim, em execução", "Existe no papel", "Está sendo elaborado", "Não existe", "Não sei"],
+      "quando": { "categoria": ["poder_publico"] }
+    },
+    {
+      "id": "gestao_programas",
+      "secao": "Gestão pública",
+      "texto": "Que programas o município acessa hoje para a zona rural?",
+      "tipo": "multipla",
+      "opcoes": [
+        "PNAE", "PAA", "Programa de cisternas", "Garantia-Safra", "ATER pública",
+        "Programa de estradas vicinais", "Nenhum", "Não sei"
+      ],
+      "quando": { "categoria": ["poder_publico"] }
+    },
+    {
+      "id": "gestao_articulacao",
+      "secao": "Gestão pública",
+      "texto": "Quanto as secretarias conversam entre si sobre o tema rural?",
+      "tipo": "escala",
+      "opcoes": ["Não conversam", "Muito pouco", "Às vezes", "Com frequência", "Trabalham juntas"],
+      "quando": { "categoria": ["poder_publico"] }
+    },
+    {
+      "id": "gestao_gargalo",
+      "secao": "Gestão pública",
+      "texto": "Qual o maior gargalo da sua área para atender a zona rural?",
+      "tipo": "audio",
+      "quando": { "categoria": ["poder_publico"] }
+    },
+    {
+      "id": "gestao_orcamento",
+      "secao": "Gestão pública",
+      "texto": "Sua área tem orçamento próprio destinado à zona rural?",
+      "tipo": "unica",
+      "opcoes": ["Sim, rubrica própria", "Sai de outra rubrica", "Não tem", "Não sei"],
+      "quando": { "categoria": ["poder_publico"] }
+    },
+    {
+      "id": "gestao_equipe",
+      "secao": "Gestão pública",
+      "texto": "Existe equipe técnica dedicada ao atendimento rural?",
+      "tipo": "unica",
+      "opcoes": ["Sim, equipe própria", "Um técnico apenas", "Serviço terceirizado", "Não existe"],
+      "quando": { "categoria": ["poder_publico"] }
+    },
+    {
+      "id": "gestao_demandas",
+      "secao": "Gestão pública",
+      "texto": "Como as demandas da zona rural chegam até você?",
+      "tipo": "multipla",
+      "opcoes": [
+        "Visita da própria comunidade", "Associação ou sindicato", "Vereador",
+        "Conselho municipal", "Agente de saúde ou professor", "Não chegam de forma organizada"
+      ],
+      "quando": { "categoria": ["poder_publico"] }
+    },
+    {
+      "id": "gestao_conselho",
+      "secao": "Gestão pública",
+      "texto": "Existe conselho municipal de desenvolvimento rural em funcionamento?",
+      "tipo": "unica",
+      "opcoes": ["Sim, reúne com regularidade", "Existe mas está parado", "Nunca foi criado", "Não sei"],
+      "quando": { "categoria": ["poder_publico"] }
+    },
+    {
+      "id": "gestao_parcerias",
+      "secao": "Gestão pública",
+      "texto": "Que parcerias o município tem hoje para o rural?",
+      "tipo": "multipla",
+      "opcoes": [
+        "ATER estadual", "INCRA", "Universidade ou instituto federal", "Sebrae",
+        "Cooperativas", "ONG ou entidade de apoio", "Banco público", "Nenhuma"
+      ],
+      "quando": { "categoria": ["poder_publico"] }
+    },
+    {
+      "id": "gestao_estradas",
+      "secao": "Gestão pública",
+      "texto": "Como avalia as estradas vicinais que ligam as comunidades?",
+      "tipo": "escala",
+      "opcoes": ["Muito ruins", "Ruins", "Regulares", "Boas", "Muito boas"],
+      "quando": { "categoria": ["poder_publico"] }
+    },
+    {
+      "id": "gestao_dificuldade",
+      "secao": "Gestão pública",
+      "texto": "Qual a maior dificuldade para executar política rural aqui?",
+      "tipo": "multipla",
+      "maximo": 3,
+      "opcoes": [
+        "Falta de recurso", "Falta de equipe", "Falta de dado sobre o território",
+        "Distância e acesso", "Descontinuidade entre gestões", "Pouca articulação entre secretarias",
+        "Baixa organização das comunidades"
+      ],
+      "quando": { "categoria": ["poder_publico"] }
+    },
+    {
+      "id": "gestao_prioridade",
+      "secao": "Gestão pública",
+      "texto": "Qual deve ser a prioridade para o território nos próximos 4 anos?",
+      "tipo": "multipla",
+      "maximo": 3,
+      "opcoes": [
+        "Água e convivência com a estiagem", "Estradas", "Assistência técnica",
+        "Comercialização e mercado institucional", "Regularização fundiária",
+        "Permanência do jovem no campo", "Energia e internet", "Educação do campo"
+      ],
+      "quando": { "categoria": ["poder_publico"] }
+    },
+    {
+      "id": "gestao_doze_meses",
+      "secao": "Gestão pública",
+      "texto": "O que dá para fazer nos próximos 12 meses, com o que já existe?",
+      "tipo": "audio",
+      "quando": { "categoria": ["poder_publico"] }
+    },
+
+    {
+      "id": "prefeito_pacto",
+      "secao": "Compromisso da pasta",
+      "texto": "A prefeitura assumiria um pacto de metas com as comunidades ao fim do diagnóstico?",
+      "tipo": "unica",
+      "opcoes": ["Sim, com metas públicas", "Sim, sem formalizar", "Precisa avaliar", "Não"],
+      "quando": { "categoria": ["poder_publico"], "cargo": ["prefeito"] }
+    },
+    {
+      "id": "cultura_patrimonio",
+      "secao": "Compromisso da pasta",
+      "texto": "Existe mapeamento das expressões culturais e dos saberes tradicionais do território?",
+      "tipo": "unica",
+      "opcoes": ["Sim, atualizado", "Existe, mas desatualizado", "Nunca foi feito", "Não sei"],
+      "quando": { "categoria": ["poder_publico"], "cargo": ["cultura"] }
+    },
+    {
+      "id": "administracao_pessoal",
+      "secao": "Compromisso da pasta",
+      "texto": "A estrutura de pessoal hoje dá conta de atender a zona rural?",
+      "tipo": "unica",
+      "opcoes": ["Dá conta", "Atende parcialmente", "Não dá conta", "Não sei avaliar"],
+      "quando": { "categoria": ["poder_publico"], "cargo": ["administracao"] }
+    },
+    {
+      "id": "ambiente_prioridades",
+      "secao": "Compromisso da pasta",
+      "texto": "Que temas ambientais são prioridade no território?",
+      "tipo": "multipla",
+      "maximo": 3,
+      "opcoes": [
+        "Recuperação de nascentes", "Saneamento rural", "Resíduos sólidos",
+        "Desmatamento", "Uso de agrotóxico", "Licenciamento da produção familiar",
+        "Educação ambiental"
+      ],
+      "quando": { "categoria": ["poder_publico"], "cargo": ["desenvolvimento_meio_ambiente"] }
+    },
+    {
+      "id": "financas_investimento",
+      "secao": "Compromisso da pasta",
+      "texto": "Qual a capacidade de investimento próprio do município no rural?",
+      "tipo": "unica",
+      "opcoes": [
+        "Consegue investir com recurso próprio", "Só com contrapartida de convênio",
+        "Só com emenda ou convênio integral", "Sem capacidade hoje"
+      ],
+      "quando": { "categoria": ["poder_publico"], "cargo": ["financas"] }
+    }
+  ]
+}
