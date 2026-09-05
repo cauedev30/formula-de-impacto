@@ -2,7 +2,7 @@ import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
 import test from "node:test";
 
-import { agruparPorSecao, limparOrfas, montarFormulario, progresso } from "../lib/montar-formulario.mjs";
+import { agruparPorSecao, limparOrfas, montarFormulario, progresso, respondida } from "../lib/montar-formulario.mjs";
 
 const banco = JSON.parse(readFileSync(new URL("../data/perguntas.json", import.meta.url)));
 const ids = (perfil, respostas) => montarFormulario(banco, perfil, respostas).map((p) => p.id);
@@ -99,4 +99,20 @@ test("progresso conta áudio gravado como resposta e texto vazio como pendência
   assert.deepEqual(progresso(perguntas, {}), { feitas: 0, total: perguntas.length });
   const parcial = { nome: "  ", idade: 19, jovem_uma_mudanca: { audioId: "a1" }, maiores_faltas: [] };
   assert.equal(progresso(perguntas, parcial).feitas, 2);
+});
+
+test("resposta aberta só digitada conta como respondida, sem áudio nenhum", () => {
+  const pergunta = { id: "melhoria_renda", tipo: "audio" };
+  assert.equal(respondida(pergunta, { texto: "Precisaria de estrada melhor." }), true);
+  assert.equal(respondida(pergunta, { audioId: "a1" }), true);
+  assert.equal(respondida(pergunta, { texto: "   " }), false);
+  assert.equal(respondida(pergunta, {}), false);
+});
+
+test("progresso conta a pergunta aberta respondida por escrito", () => {
+  const perguntas = [
+    { id: "melhoria_renda", tipo: "audio" },
+    { id: "nome", tipo: "texto" },
+  ];
+  assert.deepEqual(progresso(perguntas, { melhoria_renda: { texto: "Estrada." } }), { feitas: 1, total: 2 });
 });
