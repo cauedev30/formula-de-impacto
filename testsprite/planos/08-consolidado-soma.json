@@ -1,0 +1,14 @@
+{
+  "projectId": "0e0772fb-f01a-4e04-81c3-68e0bc4c0e2a",
+  "type": "frontend",
+  "name": "Consolidado soma duas entrevistas",
+  "description": "O consolidado conta as respostas de todas as entrevistas do aparelho, nao de uma so.",
+  "priority": "p1",
+  "planSteps": [
+    { "type": "action", "description": "Abrir a pagina inicial e criar o acesso com nome 'Entrevistador de Teste', codigo de acesso '1234' e confirmacao '1234'." },
+    { "type": "action", "description": "Fazer uma entrevista de 'Agricultor(a) familiar', 'Adulto', 'Homem': preencher o nome do entrevistado como 'Joao Pereira', responder tres perguntas de multipla escolha e tocar em 'Concluir'." },
+    { "type": "action", "description": "Voltar ao inicio e fazer uma segunda entrevista com o mesmo perfil, nome do entrevistado 'Antonio Souza', respondendo as mesmas tres perguntas com as mesmas opcoes, e tocar em 'Concluir'." },
+    { "type": "action", "description": "Na tela inicial, tocar no botao 'Ver consolidado'." },
+    { "type": "assertion", "description": "O consolidado informa que ha 2 entrevistas no recorte, e as barras de contagem das perguntas respondidas por ambos mostram 2, nao 1." }
+  ]
+}

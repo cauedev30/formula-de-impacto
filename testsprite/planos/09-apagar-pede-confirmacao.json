@@ -1,0 +1,15 @@
+{
+  "projectId": "0e0772fb-f01a-4e04-81c3-68e0bc4c0e2a",
+  "type": "frontend",
+  "name": "Apagar entrevista exige um segundo toque",
+  "description": "Apagar em campo e irreversivel: o primeiro toque arma e o segundo confirma, para nao perder entrevista por toque acidental.",
+  "priority": "p1",
+  "planSteps": [
+    { "type": "action", "description": "Abrir a pagina inicial e criar o acesso com nome 'Entrevistador de Teste', codigo de acesso '1234' e confirmacao '1234'." },
+    { "type": "action", "description": "Fazer uma entrevista de 'Agricultor(a) familiar', 'Adulto', 'Homem' com o nome do entrevistado 'Joao Pereira', responder uma pergunta e voltar para a tela inicial." },
+    { "type": "action", "description": "Na lista de entrevistas, tocar uma vez no botao 'Apagar' da entrevista de 'Joao Pereira'." },
+    { "type": "assertion", "description": "O botao muda para 'Apagar mesmo?' e a entrevista continua na lista." },
+    { "type": "action", "description": "Tocar no botao 'Apagar mesmo?'." },
+    { "type": "assertion", "description": "A entrevista de 'Joao Pereira' sai da lista." }
+  ]
+}

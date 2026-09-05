@@ -1,0 +1,15 @@
+{
+  "projectId": "0e0772fb-f01a-4e04-81c3-68e0bc4c0e2a",
+  "type": "frontend",
+  "name": "Pergunta condicional abre e fecha conforme a resposta",
+  "description": "A pergunta sobre o obstaculo de escoamento so existe quando o entrevistado diz que nao consegue escoar tudo.",
+  "priority": "p1",
+  "planSteps": [
+    { "type": "action", "description": "Abrir a pagina inicial e criar o acesso com nome 'Entrevistador de Teste', codigo de acesso '1234' e confirmacao '1234'." },
+    { "type": "action", "description": "Escolher 'Agricultor(a) familiar', 'Adulto' e 'Homem', e tocar em 'Comecar entrevista'." },
+    { "type": "action", "description": "Localizar a pergunta sobre conseguir escoar a producao e responder 'So uma parte'." },
+    { "type": "assertion", "description": "Aparece no formulario uma nova pergunta sobre o que impede escoar a producao." },
+    { "type": "action", "description": "Voltar na mesma pergunta de escoamento e trocar a resposta para 'Sim, tudo'." },
+    { "type": "assertion", "description": "A pergunta sobre o que impede escoar a producao desaparece do formulario." }
+  ]
+}

@@ -1,0 +1,16 @@
+{
+  "projectId": "0e0772fb-f01a-4e04-81c3-68e0bc4c0e2a",
+  "type": "frontend",
+  "name": "Concluir a entrevista gera a ficha do entrevistado",
+  "description": "Ao concluir, o app leva para a ficha com as respostas dadas e marca as nao respondidas.",
+  "priority": "p1",
+  "planSteps": [
+    { "type": "action", "description": "Abrir a pagina inicial e criar o acesso com nome 'Entrevistador de Teste', codigo de acesso '1234' e confirmacao '1234'." },
+    { "type": "action", "description": "Escolher 'Agricultor(a) familiar', 'Adulto' e 'Homem', tocar em 'Comecar entrevista' e responder o nome do entrevistado como 'Joao Pereira' mais tres perguntas quaisquer." },
+    { "type": "action", "description": "Tocar em 'Concluir' no rodape." },
+    { "type": "assertion", "description": "O app abre a ficha do entrevistado mostrando 'Joao Pereira' e as respostas que foram dadas." },
+    { "type": "assertion", "description": "As perguntas deixadas em branco aparecem marcadas como 'nao respondida', em vez de sumirem da ficha." },
+    { "type": "action", "description": "Voltar para a tela inicial." },
+    { "type": "assertion", "description": "A entrevista de 'Joao Pereira' aparece na lista de entrevistas do aparelho." }
+  ]
+}

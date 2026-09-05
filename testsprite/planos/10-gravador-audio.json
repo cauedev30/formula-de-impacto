@@ -1,0 +1,15 @@
+{
+  "projectId": "0e0772fb-f01a-4e04-81c3-68e0bc4c0e2a",
+  "type": "frontend",
+  "name": "Pergunta aberta oferece audio e escrita",
+  "description": "A resposta longa pode ser gravada ou digitada; sem microfone liberado o app avisa em vez de travar.",
+  "priority": "p1",
+  "planSteps": [
+    { "type": "action", "description": "Abrir a pagina inicial e criar o acesso com nome 'Entrevistador de Teste', codigo de acesso '1234' e confirmacao '1234'." },
+    { "type": "action", "description": "Escolher 'Agricultor(a) familiar', 'Adulto' e 'Homem', e tocar em 'Comecar entrevista'." },
+    { "type": "action", "description": "Rolar ate a pergunta sobre o que precisaria acontecer para a renda melhorar." },
+    { "type": "assertion", "description": "Essa pergunta oferece um botao 'Gravar resposta' e tambem um campo de texto para escrever a resposta, com o texto de apoio dizendo que da para anotar se preferir escrever." },
+    { "type": "action", "description": "Escrever no campo de texto dessa pergunta: 'Precisaria de estrada melhor para escoar a producao.'" },
+    { "type": "assertion", "description": "O texto fica salvo, a pergunta passa a contar como respondida e o progresso no rodape aumenta." }
+  ]
+}

@@ -3,6 +3,8 @@
 //   npm run test:ui
 import { mkdirSync, writeFileSync } from "node:fs";
 
+import { comandos, conectar, espera } from "./cdp.mjs";
+
 const BASE = process.env.BASE_URL ?? "http://localhost:3000";
 const CDP_PORT = process.env.CDP_PORT ?? 9222;
 const SAIDA = process.env.SAIDA ?? "telas";
@@ -24,39 +26,7 @@ const DEVICES = [
   { nome: "ipad-pro-deitado-1194", largura: 1194, altura: 834, escala: 2, movel: true },
 ];
 
-const alvo = await (await fetch(`http://localhost:${CDP_PORT}/json/new?about:blank`, { method: "PUT" })).json();
-const ws = new WebSocket(alvo.webSocketDebuggerUrl);
-await new Promise((resolve, reject) => {
-  ws.onopen = resolve;
-  ws.onerror = reject;
-});
-
-let seq = 0;
-const pendentes = new Map();
-ws.onmessage = (e) => {
-  const msg = JSON.parse(e.data);
-  const resolver = pendentes.get(msg.id);
-  if (!resolver) return;
-  pendentes.delete(msg.id);
-  resolver(msg.error ? { erro: msg.error } : msg.result);
-};
-const cdp = (method, params = {}) =>
-  new Promise((resolve) => {
-    const id = ++seq;
-    pendentes.set(id, resolve);
-    ws.send(JSON.stringify({ id, method, params }));
-  });
-
-const espera = (ms) => new Promise((r) => setTimeout(r, ms));
-const js = async (expressao) => {
-  const r = await cdp("Runtime.evaluate", {
-    expression: `(async () => { ${expressao} })()`,
-    awaitPromise: true,
-    returnByValue: true,
-  });
-  if (r?.exceptionDetails) throw new Error(r.exceptionDetails.text ?? "erro no page script");
-  return r?.result?.value;
-};
+const { cdp, js, fechar } = await conectar(CDP_PORT);
 
 const AUDITORIA = `
   const luminancia = (cor) => {
@@ -171,51 +141,7 @@ const AUDITORIA = `
   return achados;
 `;
 
-const clicar = (texto) =>
-  js(`
-    const alvo = [...document.querySelectorAll("button, a")].find((b) => b.textContent.trim() === ${JSON.stringify(texto)});
-    if (!alvo) return false;
-    alvo.click();
-    return true;
-  `);
-
-// A bateria passa pela tranca criando o acesso pela própria tela, não burlando o localStorage:
-// assim a tela de entrada também é medida em todo aparelho.
-const digitarEm = (seletor, valor) =>
-  js(`
-    const campo = document.querySelector(${JSON.stringify(seletor)});
-    if (!campo) return false;
-    Object.getOwnPropertyDescriptor(HTMLInputElement.prototype, "value").set.call(campo, ${JSON.stringify(valor)});
-    campo.dispatchEvent(new Event("input", { bubbles: true }));
-    return true;
-  `);
-
-const passarPelaTranca = async () => {
-  if (!(await js(`return Boolean(document.querySelector("#pin"));`))) return "destrancado";
-  const cadastro = await js(`return Boolean(document.querySelector("#nome"));`);
-  if (cadastro) {
-    await digitarEm("#nome", "Entrevistador de Teste");
-    await digitarEm("#pin", "1234");
-    await digitarEm("#confirmacao", "1234");
-    await clicar("Criar acesso");
-  } else {
-    await digitarEm("#pin", "1234");
-    await clicar("Entrar");
-  }
-  await espera(1400);
-  return cadastro ? "acesso criado" : "entrou";
-};
-
-const preencher = (rotulo, valor) =>
-  js(`
-    const campo = [...document.querySelectorAll("input, textarea")]
-      .find((c) => (c.getAttribute("aria-label") || "").includes(${JSON.stringify(rotulo)}));
-    if (!campo) return false;
-    const proto = campo.tagName === "TEXTAREA" ? HTMLTextAreaElement : HTMLInputElement;
-    Object.getOwnPropertyDescriptor(proto.prototype, "value").set.call(campo, ${JSON.stringify(valor)});
-    campo.dispatchEvent(new Event("input", { bubbles: true }));
-    return true;
-  `);
+const { clicar, preencher, passarPelaTranca, limparAparelho } = comandos(js);
 
 async function foto(nome) {
   const { data } = await cdp("Page.captureScreenshot", { format: "png", captureBeyondViewport: true });
@@ -245,25 +171,7 @@ for (const device of DEVICES) {
 
   await cdp("Page.navigate", { url: BASE });
   await espera(2200);
-  // Cada aparelho começa do zero. `deleteDatabase` fica pendente enquanto houver conexão
-  // aberta, então limpamos os registros dentro de uma transação, que sempre conclui.
-  await js(`
-    return new Promise((res) => {
-      const abrir = indexedDB.open("entrevista-campo");
-      abrir.onsuccess = () => {
-        const db = abrir.result;
-        const nomes = [...db.objectStoreNames];
-        if (!nomes.length) return res(true);
-        const tx = db.transaction(nomes, "readwrite");
-        nomes.forEach((n) => tx.objectStore(n).clear());
-        tx.oncomplete = () => res(true);
-        tx.onerror = () => res(false);
-      };
-      abrir.onerror = () => res(false);
-      setTimeout(() => res("timeout"), 4000);
-    });
-  `);
-  await js(`localStorage.clear(); sessionStorage.clear(); return true;`);
+  await limparAparelho();
   await cdp("Page.reload");
   await espera(2200);
 
@@ -314,7 +222,7 @@ for (const device of DEVICES) {
   await foto(`${device.nome}-5-consolidado`);
 }
 
-ws.close();
+fechar();
 
 const porTipo = new Map();
 for (const p of problemas) {

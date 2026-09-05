@@ -8,12 +8,15 @@ Funciona sem sinal de celular: é onde a entrevista acontece.
 
 ```
 $ npm test
-# tests 23
-# pass 23
+# tests 31
+# pass 31
 # fail 0
 
+$ npm run validar
+40 verificações · 40 passaram · 0 falharam
+
 $ npm run test:ui
-7 aparelhos · 5 telas cada · telas em telas/
+9 aparelhos · 5 telas cada · telas em telas/
 nenhum problema de usabilidade encontrado
 ```
 
@@ -24,7 +27,7 @@ nenhum problema de usabilidade encontrado
 | Banco de perguntas com tags de perfil | `data/perguntas.json` |
 | Montagem do formulário a partir do perfil | `lib/montar-formulario.mjs` |
 | Persistência local (IndexedDB) | `lib/db.mjs` |
-| Gravação de áudio e transcrição no aparelho | `components/GravadorAudio.jsx`, `lib/transcrever.mjs` |
+| Gravação de áudio e fila de transcrição | `components/GravadorAudio.jsx`, `lib/transcrever.mjs` |
 | Exportação em ZIP e consolidado | `lib/exportar.mjs` |
 | Funcionamento offline | `public/sw.js` |
 
@@ -54,6 +57,27 @@ Sem sinal a gravação fica anotada como pendente e a transcrição acontece soz
 volta. O ZIP exportado traz os áudios originais de qualquer forma, e o `LEIAME.txt` de dentro dele
 tem o comando para refazer tudo no computador com o `vox`.
 
+## Validação
+
+Três camadas, porque cada uma alcança o que a outra não vê.
+
+| Camada | Comando | O que cobre |
+|---|---|---|
+| Unidade | `npm test` | montagem do formulário por perfil, exportação, fila de transcrição |
+| Funcional em navegador | `npm run validar` | tranca, condicionais, persistência, gravação e transcrição de verdade, fila offline, service worker, banco recriado após perder um store, erros da API |
+| Usabilidade | `npm run test:ui` | 9 aparelhos × 5 telas: alvo de toque, contraste, estouro horizontal |
+| Agente na nuvem | `testsprite testlist run <id> --wait` | os mesmos fluxos vistos por quem não conhece o código (planos em `testsprite/planos/`) |
+
+`npm run validar` precisa de um Chrome com microfone falso: é o que exercita
+`getUserMedia` → `MediaRecorder` → `/api/transcrever` sem aparelho físico.
+
+```bash
+chrome --headless=new --remote-debugging-port=9223 \
+  --use-fake-device-for-media-stream --use-fake-ui-for-media-stream \
+  --use-file-for-fake-audio-capture=fala-em-portugues.wav
+CDP_PORT=9223 npm run validar
+```
+
 ## Desenvolvimento
 
 ```bash
@@ -62,7 +86,8 @@ npm run dev          # http://localhost:3000
 npm test             # motor de montagem e exportação
 npm run build        # export estático em out/
 npm run servir       # serve out/ como o Cloudflare Pages serve
-npm run test:ui      # usabilidade em 7 aparelhos (precisa de npm run servir e Chrome com CDP)
+npm run test:ui      # usabilidade em 9 aparelhos (precisa de npm run servir e Chrome com CDP)
+npm run validar      # bateria funcional contra produção (precisa de Chrome com microfone falso)
 ```
 
 ## Publicação

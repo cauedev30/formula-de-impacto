@@ -1,0 +1,15 @@
+{
+  "projectId": "0e0772fb-f01a-4e04-81c3-68e0bc4c0e2a",
+  "type": "frontend",
+  "name": "Resposta sobrevive ao recarregar a aba",
+  "description": "O app grava no aparelho: fechar e reabrir a entrevista no meio nao pode perder o que ja foi respondido.",
+  "priority": "p0",
+  "planSteps": [
+    { "type": "action", "description": "Abrir a pagina inicial e criar o acesso com nome 'Entrevistador de Teste', codigo de acesso '1234' e confirmacao '1234'." },
+    { "type": "action", "description": "Escolher 'Agricultor(a) familiar', 'Adulto' e 'Mulher', e tocar em 'Comecar entrevista'." },
+    { "type": "action", "description": "Preencher o nome do entrevistado com 'Maria das Gracas Silva' e a comunidade com 'Sitio Bom Jardim'. Responder mais duas perguntas de multipla escolha quaisquer." },
+    { "type": "assertion", "description": "O rodape passa a indicar 'salvo no aparelho' e o progresso deixa de ser zero." },
+    { "type": "action", "description": "Recarregar a pagina atual, mantendo a mesma URL com o id da entrevista." },
+    { "type": "assertion", "description": "Depois do recarregamento o nome 'Maria das Gracas Silva' e a comunidade 'Sitio Bom Jardim' continuam preenchidos, e o progresso no rodape continua o mesmo de antes." }
+  ]
+}

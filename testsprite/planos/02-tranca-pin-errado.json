@@ -1,0 +1,16 @@
+{
+  "projectId": "0e0772fb-f01a-4e04-81c3-68e0bc4c0e2a",
+  "type": "frontend",
+  "name": "Codigo de acesso errado nao entra",
+  "description": "Depois de criado o acesso, um codigo diferente do cadastrado nao pode abrir o app.",
+  "priority": "p0",
+  "planSteps": [
+    { "type": "action", "description": "Abrir a pagina inicial e criar o acesso com nome 'Entrevistador de Teste', codigo de acesso '1234' e confirmacao '1234'." },
+    { "type": "action", "description": "Encerrar a sessao: no console do navegador, executar sessionStorage.clear() e recarregar a pagina." },
+    { "type": "assertion", "description": "A tela agora pede apenas o codigo de acesso para entrar. Nao pede nome nem confirmacao, porque o acesso ja existe neste aparelho." },
+    { "type": "action", "description": "Digitar o codigo '9999' e tocar em 'Entrar'." },
+    { "type": "assertion", "description": "O app continua trancado, mostra o aviso 'Codigo errado.' e nao exibe a pergunta 'Quem voce vai entrevistar?' e as categorias de entrevistado." },
+    { "type": "action", "description": "Digitar o codigo correto '1234' e tocar em 'Entrar'." },
+    { "type": "assertion", "description": "O app destranca e mostra a pergunta 'Quem voce vai entrevistar?'." }
+  ]
+}

@@ -1,0 +1,13 @@
+{
+  "projectId": "0e0772fb-f01a-4e04-81c3-68e0bc4c0e2a",
+  "type": "frontend",
+  "name": "Tranca cria o acesso do entrevistador",
+  "description": "O aparelho novo pede cadastro antes de qualquer entrevista, e o acesso criado destranca o app.",
+  "priority": "p0",
+  "planSteps": [
+    { "type": "action", "description": "Abrir a pagina inicial do app." },
+    { "type": "assertion", "description": "A primeira tela e a de acesso: existe um campo de nome do entrevistador, um campo para criar um codigo de 4 numeros e um campo de confirmacao desse codigo. Nenhuma entrevista aparece antes disso." },
+    { "type": "action", "description": "Preencher o nome com 'Entrevistador de Teste', o codigo com '1234' e a confirmacao com '1234', e tocar no botao 'Criar acesso'." },
+    { "type": "assertion", "description": "O app destranca e mostra a tela inicial com a pergunta 'Quem voce vai entrevistar?' e as categorias de entrevistado." }
+  ]
+}
