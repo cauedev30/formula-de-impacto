@@ -9,6 +9,7 @@
     "test": "node --test 'test/*.test.mjs'",
     "test:ui": "node scripts/usabilidade.mjs",
     "validar": "node scripts/validar.mjs",
+    "comparar": "node scripts/comparar-transcricao.mjs",
     "servir": "node scripts/servir.mjs",
     "deploy": "npm run build && npx wrangler pages deploy out --project-name=formula-de-impacto --commit-dirty=true"
   },

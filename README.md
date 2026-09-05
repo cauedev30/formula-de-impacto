@@ -18,6 +18,9 @@ $ npm run validar
 $ npm run test:ui
 9 aparelhos · 5 telas cada · telas em telas/
 nenhum problema de usabilidade encontrado
+
+$ npm run comparar
+erro geral: 4.6% em 690 palavras
 ```
 
 ## Como funciona
@@ -57,25 +60,43 @@ Sem sinal a gravação fica anotada como pendente e a transcrição acontece soz
 volta. O ZIP exportado traz os áudios originais de qualquer forma, e o `LEIAME.txt` de dentro dele
 tem o comando para refazer tudo no computador com o `vox`.
 
-## Validação
+### Medir a qualidade da transcrição
 
-Três camadas, porque cada uma alcança o que a outra não vê.
-
-| Camada | Comando | O que cobre |
-|---|---|---|
-| Unidade | `npm test` | montagem do formulário por perfil, exportação, fila de transcrição |
-| Funcional em navegador | `npm run validar` | tranca, condicionais, persistência, gravação e transcrição de verdade, fila offline, service worker, banco recriado após perder um store, erros da API |
-| Usabilidade | `npm run test:ui` | 9 aparelhos × 5 telas: alvo de toque, contraste, estouro horizontal |
-| Agente na nuvem | `testsprite testlist run <id> --wait` | os mesmos fluxos vistos por quem não conhece o código (planos em `testsprite/planos/`) |
-
-`npm run validar` precisa de um Chrome com microfone falso: é o que exercita
-`getUserMedia` → `MediaRecorder` → `/api/transcrever` sem aparelho físico.
+`npm run comparar` gera fala em português com o Piper a partir de texto que nós escrevemos,
+manda o áudio para a API e compara o que volta com esse texto. Como o texto de origem é
+conhecido, o número é erro de verdade — não concordância entre duas transcrições.
 
 ```bash
-chrome --headless=new --remote-debugging-port=9223 \
-  --use-fake-device-for-media-stream --use-fake-ui-for-media-stream \
-  --use-file-for-fake-audio-capture=fala-em-portugues.wav
-CDP_PORT=9223 npm run validar
+npm run comparar                 # 12 falas × 3 vozes
+MOSTRAR_TEXTO=1 npm run comparar # mostra o que foi escrito e o que voltou
+```
+
+As falas estão em `data/falas-de-teste.json` e usam o vocabulário que aparece no banco de
+perguntas — escoar, assentamento, quilombola, Pronaf, Incra, cisterna, estiagem. É aí que a
+transcrição erra, e é o erro que chega ao relatório.
+
+A saída lista as palavras trocadas em mais de uma voz. Foi assim que apareceu o primeiro
+caso: `escoar` voltando como `consome`, que significa o contrário do que a pessoa disse.
+
+Essa medição encontrou o defeito que motivou o `initial_prompt` da função: sem contexto, o
+modelo não espera ouvir os nomes próprios da política rural.
+
+| | Sem vocabulário | Com `initial_prompt` |
+|---|---|---|
+| Erro geral | 7,2% | **4,6%** |
+| `quilombola` | `o Amor` | correto nas 3 vozes |
+| `Incra` | `em um crédito` | correto em 2 de 3 |
+| `Pronaf` | `PUNAF`, `PONAF` | correto |
+| `escoar` | `espor` | correto |
+
+Voz sintética é limpa. Isso mede o caminho e o vocabulário, não vento, distância do
+microfone ou sotaque — para isso não há substituto para gravar em campo.
+
+Instalar (uma vez, ~380 MB, tudo fora do git):
+
+```bash
+python3 -m venv .piper/venv && .piper/venv/bin/pip install piper-tts
+# vozes pt_BR de huggingface.co/rhasspy/piper-voices em .piper/vozes/
 ```
 
 ## Desenvolvimento

@@ -1,0 +1,53 @@
+{
+  "sobre": "Falas sintéticas para medir a transcrição contra texto conhecido. Cada uma usa o vocabulário que aparece de verdade no banco de perguntas: é onde a transcrição erra e o erro chega ao relatório. Números vão em dígito porque é assim que a transcrição devolve; grafia diferente não é erro de sentido.",
+  "falas": [
+    {
+      "id": "escoamento",
+      "texto": "A gente consegue escoar só uma parte da produção. A estrada fica ruim na época da chuva e o caminhão não sobe."
+    },
+    {
+      "id": "atravessador",
+      "texto": "Quem compra aqui é o atravessador. Ele paga pouco, mas é o único que vem buscar na porteira."
+    },
+    {
+      "id": "credito",
+      "texto": "Já tentei o Pronaf duas vezes. Na primeira faltou documento, na segunda o banco pediu garantia que eu não tinha."
+    },
+    {
+      "id": "assistencia",
+      "texto": "Assistência técnica aqui quase não existe. O técnico da Emater passou uma vez no ano passado e não voltou mais."
+    },
+    {
+      "id": "assentamento",
+      "texto": "Eu sou assentado do Incra desde 2011. O lote é meu, mas o título definitivo ainda não saiu."
+    },
+    {
+      "id": "quilombola",
+      "texto": "Nossa comunidade é quilombola certificada pela Fundação Palmares. A titulação do território a gente ainda espera."
+    },
+    {
+      "id": "agua",
+      "texto": "A água vem de cisterna e de poço. Na estiagem falta, e aí a gente compra carro-pipa."
+    },
+    {
+      "id": "juventude",
+      "texto": "Depois do ensino médio eu quero sair pra estudar, mas queria voltar. Se tivesse internet boa e um trabalho aqui, eu ficava."
+    },
+    {
+      "id": "renda",
+      "texto": "A renda é da roça mesmo, mais o Bolsa Família. Se melhorasse o preço e tivesse cooperativa, dava pra viver só da produção."
+    },
+    {
+      "id": "cooperativa",
+      "texto": "Participo da associação de moradores, mas de cooperativa não. Aqui perto não tem nenhuma que compre da gente."
+    },
+    {
+      "id": "gestao_gargalo",
+      "texto": "O maior gargalo da secretaria é equipe. São três técnicos pra atender 40 comunidades rurais espalhadas no município."
+    },
+    {
+      "id": "gestao_doze_meses",
+      "texto": "Nos próximos 12 meses dá pra recuperar as estradas vicinais e regularizar o transporte escolar da zona rural."
+    }
+  ]
+}

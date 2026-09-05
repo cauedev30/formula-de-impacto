@@ -26,6 +26,9 @@ npm run test:ui
 
 testsprite testlist run <id> --wait
 # 10 casos · 10 passaram
+
+npm run comparar
+# 12 falas × 3 vozes, erro medido contra o texto que gerou o áudio
 ```
 
 ## Fora de escopo
@@ -37,3 +40,5 @@ testsprite testlist run <id> --wait
 - Teste em Safari e em aparelho físico. A bateria mede intenção de layout que o Safari
   respeita e o Chromium esconde, mas não substitui abrir no iPhone.
 - Carga e concorrência. Um operador, um aparelho.
+- Robustez a ruído de campo. `npm run comparar` usa voz sintética, que é limpa: mede o
+  caminho e o vocabulário, não vento, distância do microfone nem sotaque regional.

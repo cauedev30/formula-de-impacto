@@ -4,3 +4,5 @@ out/
 *.zip
 telas/
 telas-producao/
+audios-de-teste/
+.piper/
