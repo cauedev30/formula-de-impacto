@@ -1,0 +1,32 @@
+{
+  "motor": "eleven",
+  "voz": "bIHbv24MWmeRgasZH58o",
+  "total": 57.769999999999996,
+  "tempos": [
+    {
+      "id": "dor",
+      "segundos": 11.89,
+      "texto": "Todo diagnóstico de território começa com um formulário de papel igual para todo mundo. O prefeito responde a mesma folha que a agricultora familiar. E anotação solta ninguém consegue somar."
+    },
+    {
+      "id": "virada",
+      "segundos": 10.54,
+      "texto": "Fórmula de Impacto é o formulário que muda conforme quem está na frente. Um instrumento da Caixa para o diagnóstico junto a agricultores familiares, quilombolas e assentados."
+    },
+    {
+      "id": "como",
+      "segundos": 16.25,
+      "texto": "Você escolhe quem vai entrevistar, e o aparelho monta na hora só as perguntas daquela pessoa. Quando a resposta é longa, o entrevistado fala, e o áudio vira texto sozinho. No fim, sai a ficha do entrevistado e sai o consolidado do território."
+    },
+    {
+      "id": "prova",
+      "segundos": 11.15,
+      "texto": "E funciona sem sinal de celular, que é justamente onde a entrevista acontece. Tudo fica guardado no aparelho, e quando a rede volta, a transcrição acontece sozinha."
+    },
+    {
+      "id": "fecho",
+      "segundos": 7.94,
+      "texto": "Da conversa em campo ao dado que sustenta a decisão. Fórmula de Impacto. Dados, pessoas, sustentabilidade."
+    }
+  ]
+}

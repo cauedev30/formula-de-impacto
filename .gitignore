@@ -6,3 +6,9 @@ telas/
 telas-producao/
 audios-de-teste/
 .piper/
+video/node_modules/
+video/out/
+video/public/telas/
+video/public/narracao/
+video/.narracoes/
+.kokoro/

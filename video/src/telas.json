@@ -1,0 +1,50 @@
+{
+  "telas/ipad-0-tranca.png": {
+    "largura": 744,
+    "altura": 1180
+  },
+  "telas/ipad-1-inicio.png": {
+    "largura": 744,
+    "altura": 1152
+  },
+  "telas/ipad-2-perfil.png": {
+    "largura": 744,
+    "altura": 1264
+  },
+  "telas/ipad-3-formulario.png": {
+    "largura": 744,
+    "altura": 11557
+  },
+  "telas/ipad-4-ficha.png": {
+    "largura": 744,
+    "altura": 3489
+  },
+  "telas/ipad-5-consolidado.png": {
+    "largura": 744,
+    "altura": 8914
+  },
+  "telas/tablet-0-tranca.png": {
+    "largura": 800,
+    "altura": 1280
+  },
+  "telas/tablet-1-inicio.png": {
+    "largura": 1600,
+    "altura": 2560
+  },
+  "telas/tablet-2-perfil.png": {
+    "largura": 1600,
+    "altura": 2560
+  },
+  "telas/tablet-3-formulario.png": {
+    "largura": 1600,
+    "altura": 23114
+  },
+  "telas/tablet-4-ficha.png": {
+    "largura": 1600,
+    "altura": 6978
+  },
+  "telas/tablet-5-consolidado.png": {
+    "largura": 1600,
+    "altura": 17724
+  }
+}

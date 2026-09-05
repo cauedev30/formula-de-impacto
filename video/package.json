@@ -1,0 +1,19 @@
+{
+  "name": "formula-de-impacto-video",
+  "private": true,
+  "version": "1.0.0",
+  "description": "Vídeo de apresentação do Fórmula de Impacto",
+  "scripts": {
+    "narrar": "node scripts/narrar.mjs",
+    "estudio": "remotion studio src/index.ts",
+    "render": "remotion render src/index.ts Apresentacao out/formula-de-impacto.mp4 --codec h264 --crf 17",
+    "render:4k": "remotion render src/index.ts Apresentacao out/formula-de-impacto-4k.mp4 --codec h264 --crf 12 --scale 2 --image-format png"
+  },
+  "dependencies": {
+    "@remotion/cli": "^4.0.520",
+    "@remotion/google-fonts": "^4.0.520",
+    "react": "^19.2.8",
+    "react-dom": "^19.2.8",
+    "remotion": "^4.0.520"
+  }
+}
