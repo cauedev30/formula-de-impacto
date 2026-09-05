@@ -30,7 +30,9 @@ const guardar = (request, resposta) => {
 
 self.addEventListener("fetch", (evento) => {
   const { request } = evento;
-  if (request.method !== "GET" || new URL(request.url).origin !== self.location.origin) return;
+  const url = new URL(request.url);
+  if (request.method !== "GET" || url.origin !== self.location.origin) return;
+  if (url.pathname.startsWith("/api/")) return;
 
   // Nome com hash nunca muda de conteúdo.
   if (request.url.includes("/_next/static/")) {

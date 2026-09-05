@@ -42,17 +42,17 @@ São 17 perfis possíveis e cada um recebe de 20 a 25 perguntas — um teste pre
 
 ## Transcrição
 
-O áudio é gravado sempre e fica salvo no aparelho. O Whisper roda dentro do navegador
-(`@huggingface/transformers`): o modelo baixa uma vez com internet e depois transcreve offline.
+O áudio é gravado sempre e fica salvo no aparelho. A transcrição roda no servidor
+(`functions/api/transcrever.js`, Workers AI com `@cf/openai/whisper-large-v3-turbo`): 2min39 de
+fala saem em cerca de 15 segundos, com pontuação, nos formatos que Safari, Chrome e Firefox gravam.
 
-Para trocar o modelo num aparelho lento, no console do navegador:
+Rodar Whisper dentro do navegador foi tentado e descartado: o Safari não libera
+`SharedArrayBuffer` sem cabeçalhos de isolamento, então o modelo usa uma thread só, leva minutos e
+esquenta o aparelho — com qualidade pior, porque só um modelo pequeno cabe.
 
-```js
-localStorage.setItem("modelo-transcricao", "onnx-community/whisper-tiny");
-```
-
-O ZIP exportado traz os `.ogg` originais, então dá para refazer a transcrição no computador com um
-modelo maior — o `LEIAME.txt` de dentro do ZIP tem o comando pronto.
+Sem sinal a gravação fica anotada como pendente e a transcrição acontece sozinha quando a internet
+volta. O ZIP exportado traz os áudios originais de qualquer forma, e o `LEIAME.txt` de dentro dele
+tem o comando para refazer tudo no computador com o `vox`.
 
 ## Desenvolvimento
 

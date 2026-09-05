@@ -110,9 +110,9 @@ export default function Resposta({ pergunta, valor, entrevistaId, aoResponder })
         onChange={(e) => trocar({ ...valor, texto: e.target.value })}
         aria-label={pergunta.texto}
       />
-      {valor?.transcritoAqui && (
+      {valor?.transcritoEm && (
         <p className="discreto" style={{ margin: 0 }}>
-          Transcrito no aparelho. O áudio continua salvo, dá para conferir depois.
+          Texto vindo do áudio. Corrija o que estiver errado — a gravação continua salva.
         </p>
       )}
     </div>
