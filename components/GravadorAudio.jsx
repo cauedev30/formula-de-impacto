@@ -3,16 +3,9 @@
 import { useEffect, useRef, useState } from "react";
 
 import { novoId, obterAudio, salvarAudio } from "@/lib/db.mjs";
+import { FORMATOS } from "@/lib/formatos-audio.mjs";
 import { aoVoltarOnline, desenfileirar, enfileirar, transcrever } from "@/lib/transcrever.mjs";
 import Icone from "./Icone";
-
-// Chrome Android grava webm/opus, Firefox grava ogg/opus e o Safari só entrega mp4.
-// A extensão real anda junto do blob: o arquivo exportado precisa dizer o que tem dentro.
-const FORMATOS = [
-  { mime: "audio/ogg;codecs=opus", extensao: "ogg" },
-  { mime: "audio/webm;codecs=opus", extensao: "webm" },
-  { mime: "audio/mp4", extensao: "m4a" },
-];
 
 const formatoSuportado = () =>
   FORMATOS.find((f) => globalThis.MediaRecorder?.isTypeSupported?.(f.mime)) ?? { mime: "", extensao: "m4a" };

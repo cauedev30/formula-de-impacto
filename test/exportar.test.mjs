@@ -2,7 +2,8 @@ import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
 import test from "node:test";
 
-import { consolidar, montarCsv } from "../lib/exportar.mjs";
+import { LEIAME, consolidar, montarCsv } from "../lib/exportar.mjs";
+import { EXTENSOES } from "../lib/formatos-audio.mjs";
 
 const banco = JSON.parse(readFileSync(new URL("../data/perguntas.json", import.meta.url)));
 
@@ -88,4 +89,13 @@ test("consolidado deixa de fora pergunta aberta, que não tem o que contar", () 
 
 test("consolidado sem entrevista nenhuma devolve lista vazia em vez de quebrar", () => {
   assert.deepEqual(consolidar(banco, []), []);
+});
+
+test("as instruções do ZIP varrem toda extensão que o gravador produz", () => {
+  for (const extensao of EXTENSOES) {
+    assert.ok(
+      LEIAME.includes(`audios/*/*.${extensao}`),
+      `o comando do LEIAME não varre .${extensao}, que é o que o Safari ou o Chrome gravam`,
+    );
+  }
 });
