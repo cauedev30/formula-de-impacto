@@ -9,11 +9,13 @@
     "test": "node --test \"test/*.test.mjs\"",
     "test:ui": "node scripts/usabilidade.mjs",
     "validar": "node scripts/validar.mjs",
+    "validar:rls": "node scripts/validar-rls.mjs",
     "comparar": "node scripts/comparar-transcricao.mjs",
     "servir": "node scripts/servir.mjs",
     "deploy": "npm run build && npx wrangler pages deploy out --project-name=formula-de-impacto --commit-dirty=true"
   },
   "dependencies": {
+    "@supabase/supabase-js": "^2.116.0",
     "jszip": "^3.10.1",
     "next": "^15.5.4",
     "react": "^19.1.0",
