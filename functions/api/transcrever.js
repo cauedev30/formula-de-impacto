@@ -26,6 +26,11 @@ const VOCABULARIO =
 
 export async function onRequestPost({ request, env }) {
   if (!env.AI) return responder({ erro: "Transcrição não está configurada." }, 503);
+  // Guarda porque o binding `ratelimits` só está documentado para Workers; em Pages, a confirmar.
+  const ip = request.headers.get("cf-connecting-ip") ?? "";
+  if (env.LIMITE && !(await env.LIMITE.limit({ key: ip })).success) {
+    return responder({ erro: "Muitos áudios de uma vez. Tente em um minuto." }, 429);
+  }
 
   const bruto = await request.arrayBuffer();
   if (!bruto.byteLength) return responder({ erro: "Nenhum áudio recebido." }, 400);

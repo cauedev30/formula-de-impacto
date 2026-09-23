@@ -6,28 +6,45 @@ import Icone from "@/components/Icone";
 import Topo from "@/components/Topo";
 import banco from "@/data/perguntas.json";
 import { listarEntrevistas } from "@/lib/db.mjs";
-import { consolidar } from "@/lib/exportar.mjs";
-import { CATEGORIAS, FAIXAS, descreverPerfil } from "@/lib/rotulos.mjs";
+import { consolidar, juntarEntrevistas, lerExportacao } from "@/lib/exportar.mjs";
+import { CATEGORIAS, FAIXAS, GENEROS, descreverPerfil } from "@/lib/rotulos.mjs";
 
-const FILTROS = [
-  { valor: "", rotulo: "Todos" },
-  ...CATEGORIAS.map((c) => ({ valor: `categoria:${c.valor}`, rotulo: c.rotulo })),
-  ...FAIXAS.map((f) => ({ valor: `faixa:${f.valor}`, rotulo: f.rotulo })),
+const EIXOS = [
+  { eixo: "categoria", itens: CATEGORIAS },
+  { eixo: "faixa", itens: FAIXAS },
+  { eixo: "genero", itens: GENEROS },
 ];
 
 export default function Consolidado() {
-  const [entrevistas, setEntrevistas] = useState([]);
-  const [filtro, setFiltro] = useState("");
+  const [locais, setLocais] = useState([]);
+  // ponytail: importadas vivem só na memória desta tela; persistir se recarregar virar dor no workshop.
+  const [importadas, setImportadas] = useState([]);
+  const [filtro, setFiltro] = useState({ categoria: "", faixa: "", genero: "" });
+  const [falha, setFalha] = useState("");
 
   useEffect(() => {
-    listarEntrevistas().then(setEntrevistas);
+    listarEntrevistas().then(setLocais);
   }, []);
 
-  const recorte = useMemo(() => {
-    if (!filtro) return entrevistas;
-    const [eixo, valor] = filtro.split(":");
-    return entrevistas.filter((e) => e.perfil[eixo] === valor);
-  }, [entrevistas, filtro]);
+  const entrevistas = useMemo(() => juntarEntrevistas(locais, importadas), [locais, importadas]);
+  const deFora = entrevistas.length - locais.length;
+
+  const recorte = useMemo(
+    () => entrevistas.filter((e) => EIXOS.every(({ eixo }) => !filtro[eixo] || e.perfil[eixo] === filtro[eixo])),
+    [entrevistas, filtro],
+  );
+
+  async function importar(evento) {
+    setFalha("");
+    const arquivos = [...evento.target.files];
+    evento.target.value = "";
+    try {
+      const lidas = (await Promise.all(arquivos.map(lerExportacao))).flat();
+      setImportadas((atuais) => juntarEntrevistas(atuais, lidas));
+    } catch (erro) {
+      setFalha(`Não consegui ler o arquivo: ${erro.message}`);
+    }
+  }
 
   const linhas = useMemo(() => consolidar(banco, recorte), [recorte]);
 
@@ -40,20 +57,28 @@ export default function Consolidado() {
           <p className="enunciado" style={{ marginBottom: 12 }}>
             {recorte.length} entrevista(s) neste recorte
           </p>
-          <div className="opcoes nao-imprime">
-            {FILTROS.map((item) => (
-              <button
-                key={item.valor}
-                type="button"
-                className="opcao"
-                aria-pressed={filtro === item.valor}
-                onClick={() => setFiltro(item.valor)}
-              >
-                <span className="marcador redondo" aria-hidden="true" />
-                <span>{item.rotulo}</span>
-              </button>
-            ))}
-          </div>
+          {deFora > 0 && <p className="discreto">{deFora} de outros aparelhos</p>}
+          {EIXOS.map(({ eixo, itens }) => (
+            <div key={eixo} className="opcoes nao-imprime" style={{ marginTop: 12 }}>
+              {[{ valor: "", rotulo: "Todos" }, ...itens].map((item) => (
+                <button
+                  key={item.valor}
+                  type="button"
+                  className="opcao"
+                  aria-pressed={filtro[eixo] === item.valor}
+                  onClick={() => setFiltro((f) => ({ ...f, [eixo]: item.valor }))}
+                >
+                  <span className="marcador redondo" aria-hidden="true" />
+                  <span>{item.rotulo}</span>
+                </button>
+              ))}
+            </div>
+          ))}
+          <label className="botao secundario nao-imprime" style={{ marginTop: 12 }}>
+            Importar de outro aparelho
+            <input type="file" accept=".zip,.json" multiple hidden onChange={importar} />
+          </label>
+          {falha && <p className="aviso">{falha}</p>}
         </div>
 
         {recorte.length === 0 && <p className="aviso">Nenhuma entrevista neste recorte ainda.</p>}
@@ -102,6 +127,7 @@ export default function Consolidado() {
               {recorte.map((e) => (
                 <li key={e.id}>
                   {e.respostas.nome || "Sem nome"} — <span className="discreto">{descreverPerfil(e.perfil)}</span>
+                  {e.entrevistador && <span className="discreto"> · por {e.entrevistador}</span>}
                 </li>
               ))}
             </ul>

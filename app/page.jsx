@@ -11,6 +11,17 @@ import { apagarEntrevista, listarEntrevistas, novoId, salvarEntrevista } from "@
 import { baixar, montarZip } from "@/lib/exportar.mjs";
 import { montarFormulario, progresso } from "@/lib/montar-formulario.mjs";
 import { CARGOS, CATEGORIAS, FAIXAS, GENEROS, descreverPerfil } from "@/lib/rotulos.mjs";
+import { pendentes } from "@/lib/transcrever.mjs";
+
+const EXPORTADO = "ultima-exportacao";
+
+const lerLocal = (chave) => {
+  try {
+    return localStorage.getItem(chave);
+  } catch {
+    return null;
+  }
+};
 
 function Escolha({ titulo, itens, valor, aoEscolher }) {
   return (
@@ -41,23 +52,38 @@ export default function Inicio() {
   const [exportando, setExportando] = useState(false);
   const [paraApagar, setParaApagar] = useState(null);
   const [falha, setFalha] = useState("");
+  const [ultimaExportacao, setUltimaExportacao] = useState(null);
+  const [fila, setFila] = useState([]);
+  const [persistido, setPersistido] = useState(true);
 
   useEffect(() => {
-    listarEntrevistas().then(setEntrevistas);
+    const atualizar = () => {
+      listarEntrevistas().then(setEntrevistas);
+      setFila(pendentes());
+    };
+    atualizar();
+    window.addEventListener("transcrito", atualizar);
+    setUltimaExportacao(lerLocal(EXPORTADO));
+    // ponytail: persisted() no Safari iOS a confirmar; o aviso some se ele sempre disser false sem PWA.
+    navigator.storage?.persisted?.().then(setPersistido, () => {});
     // Baixa o código das outras telas enquanto ainda há sinal. O service worker só guarda
     // o que passou pela rede: sem isto, abrir a entrevista offline cai numa rota sem chunk.
     for (const rota of ["/entrevista/", "/relatorio/", "/consolidado/"]) router.prefetch(rota);
+    return () => window.removeEventListener("transcrito", atualizar);
   }, [router]);
 
   const publico = perfil.categoria === "poder_publico";
   const completo = publico
-    ? Boolean(perfil.cargo)
+    ? Boolean(perfil.cargo && perfil.genero)
     : Boolean(perfil.categoria && perfil.faixa && perfil.genero);
+  const naoExportadas = entrevistas.filter(
+    (e) => !ultimaExportacao || (e.atualizadaEm ?? e.iniciadaEm) > ultimaExportacao,
+  ).length;
 
   async function comecar() {
     // O poder público entra sempre como adulto: o banco usa a faixa para abrir o bloco de
     // juventude, e secretário não responde pergunta de permanência no campo.
-    const escolhido = publico ? { ...perfil, faixa: "adulto", genero: perfil.genero ?? "masculino" } : perfil;
+    const escolhido = publico ? { ...perfil, faixa: "adulto" } : perfil;
     let entrevistador = "";
     try {
       entrevistador = JSON.parse(localStorage.getItem("acesso-formula-impacto") || "{}").nome || "";
@@ -69,6 +95,7 @@ export default function Inicio() {
       perfil: escolhido,
       entrevistador,
       respostas: {},
+      bancoVersao: banco.versao,
       iniciadaEm: new Date().toISOString(),
       concluidaEm: null,
     };
@@ -97,6 +124,13 @@ export default function Inicio() {
     try {
       const { blob, total } = await montarZip(banco);
       baixar(blob, `entrevistas-${new Date().toISOString().slice(0, 10)}-${total}.zip`);
+      const agora = new Date().toISOString();
+      try {
+        localStorage.setItem(EXPORTADO, agora);
+      } catch {
+        /* sem armazenamento o aviso só continua aparecendo */
+      }
+      setUltimaExportacao(agora);
     } finally {
       setExportando(false);
     }
@@ -138,20 +172,21 @@ export default function Inicio() {
         )}
 
         {perfil.categoria && !publico && (
-          <>
-            <Escolha
-              titulo="Faixa etária"
-              itens={FAIXAS}
-              valor={perfil.faixa}
-              aoEscolher={(faixa) => setPerfil((p) => ({ ...p, faixa }))}
-            />
-            <Escolha
-              titulo="Gênero"
-              itens={GENEROS}
-              valor={perfil.genero}
-              aoEscolher={(genero) => setPerfil((p) => ({ ...p, genero }))}
-            />
-          </>
+          <Escolha
+            titulo="Faixa etária"
+            itens={FAIXAS}
+            valor={perfil.faixa}
+            aoEscolher={(faixa) => setPerfil((p) => ({ ...p, faixa }))}
+          />
+        )}
+
+        {perfil.categoria && (
+          <Escolha
+            titulo="Gênero"
+            itens={GENEROS}
+            valor={perfil.genero}
+            aoEscolher={(genero) => setPerfil((p) => ({ ...p, genero }))}
+          />
         )}
 
         {falha && <p className="aviso">{falha}</p>}
@@ -166,11 +201,23 @@ export default function Inicio() {
         {entrevistas.length > 0 && (
           <>
             <h2 className="secao">Entrevistas no aparelho ({entrevistas.length})</h2>
+            {naoExportadas > 0 && (
+              <p className="aviso">
+                {naoExportadas} entrevista(s) só neste aparelho desde a última exportação. Exporte o ZIP ao
+                fim do dia.
+              </p>
+            )}
+            {!persistido && (
+              <p className="aviso">
+                Instale o app na tela de início — o navegador pode apagar dados de site não instalado.
+              </p>
+            )}
             <ul className="lista">
               {entrevistas.map((entrevista) => {
                 const perguntas = montarFormulario(banco, entrevista.perfil, entrevista.respostas);
                 const { feitas, total } = progresso(perguntas, entrevista.respostas);
                 const armado = paraApagar === entrevista.id;
+                const esperando = fila.filter((i) => i.entrevistaId === entrevista.id).length;
                 return (
                   <li key={entrevista.id} className="item">
                     <Link href={`/entrevista/?id=${entrevista.id}`}>
@@ -178,6 +225,13 @@ export default function Inicio() {
                         <strong>{entrevista.respostas.nome || "Sem nome"}</strong>
                         <br />
                         <span className="discreto">{descreverPerfil(entrevista.perfil)}</span>
+                        <br />
+                        {entrevista.concluidaEm ? (
+                          <span className="selo">concluída</span>
+                        ) : (
+                          <span className="discreto">em andamento</span>
+                        )}
+                        {esperando > 0 && <span className="discreto"> · {esperando} áudio(s) esperando sinal</span>}
                       </span>
                       <span className="discreto">
                         {feitas}/{total}

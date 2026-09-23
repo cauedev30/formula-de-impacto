@@ -2,7 +2,7 @@ import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
 import test from "node:test";
 
-import { agruparPorSecao, limparOrfas, montarFormulario, progresso, respondida } from "../lib/montar-formulario.mjs";
+import { agruparPorSecao, idadeForaDaFaixa, limparOrfas, montarFormulario, progresso, respondida } from "../lib/montar-formulario.mjs";
 
 const banco = JSON.parse(readFileSync(new URL("../data/perguntas.json", import.meta.url)));
 const ids = (perfil, respostas) => montarFormulario(banco, perfil, respostas).map((p) => p.id);
@@ -115,4 +115,22 @@ test("progresso conta a pergunta aberta respondida por escrito", () => {
     { id: "nome", tipo: "texto" },
   ];
   assert.deepEqual(progresso(perguntas, { melhoria_renda: { texto: "Estrada." } }), { feitas: 1, total: 2 });
+});
+
+test("limparOrfas mantém resposta de pergunta que saiu do banco numa versão nova", () => {
+  const respostas = limparOrfas(banco, agricultorJovem, { nome: "João", pergunta_antiga: "Sim" });
+  assert.equal(respostas.pergunta_antiga, "Sim");
+});
+
+test("idade acima de 29 com faixa jovem, ou até 29 com faixa adulto, pede conferência", () => {
+  const adulto = { ...agricultorJovem, faixa: "adulto" };
+  assert.equal(idadeForaDaFaixa(agricultorJovem, { idade: "34" }), true);
+  assert.equal(idadeForaDaFaixa(agricultorJovem, { idade: "29" }), false);
+  assert.equal(idadeForaDaFaixa(adulto, { idade: "29" }), true);
+  assert.equal(idadeForaDaFaixa(adulto, { idade: "30" }), false);
+});
+
+test("sem idade ou poder público não gera aviso de faixa", () => {
+  assert.equal(idadeForaDaFaixa(agricultorJovem, {}), false);
+  assert.equal(idadeForaDaFaixa(prefeito, { idade: "25" }), false);
 });
