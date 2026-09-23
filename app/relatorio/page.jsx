@@ -7,6 +7,7 @@ import Topo from "@/components/Topo";
 import banco from "@/data/perguntas.json";
 import { audiosDaEntrevista, obterEntrevista } from "@/lib/db.mjs";
 import { agruparPorSecao, montarFormulario, respondida } from "@/lib/montar-formulario.mjs";
+import { audiosDaResposta } from "@/lib/exportar.mjs";
 import { descreverPerfil } from "@/lib/rotulos.mjs";
 
 const relogio = (s = 0) => `${String(Math.floor(s / 60)).padStart(2, "0")}:${String(s % 60).padStart(2, "0")}`;
@@ -25,7 +26,7 @@ function ValorResposta({ pergunta, valor, audios }) {
   }
 
   if (typeof valor === "object") {
-    const audio = audios.find((a) => a.perguntaId === pergunta.id);
+    const audio = audios.find((a) => a.id === valor.audioId);
     return (
       <>
         {valor.audioId && (
@@ -76,6 +77,7 @@ export default function Ficha() {
   }
 
   const perguntas = montarFormulario(banco, entrevista.perfil, entrevista.respostas);
+  const gravados = audiosDaResposta(entrevista, audios);
 
   return (
     <>
@@ -88,7 +90,7 @@ export default function Ficha() {
           <p className="discreto" style={{ margin: "6px 0 0" }}>
             {entrevista.respostas.comunidade ? `${entrevista.respostas.comunidade} · ` : ""}
             {new Date(entrevista.iniciadaEm).toLocaleString("pt-BR")}
-            {audios.length > 0 && ` · ${audios.length} áudio(s)`}
+            {gravados.length > 0 && ` · ${gravados.length} áudio(s)`}
           </p>
         </div>
 

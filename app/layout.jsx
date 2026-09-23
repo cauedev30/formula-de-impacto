@@ -1,6 +1,6 @@
 import { IBM_Plex_Sans } from "next/font/google";
 
-import RegistrarServiceWorker from "@/components/RegistrarServiceWorker";
+import TarefasDeFundo from "@/components/TarefasDeFundo";
 import Tranca from "@/components/Tranca";
 import "./globals.css";
 
@@ -28,7 +28,7 @@ export default function RootLayout({ children }) {
   return (
     <html lang="pt-BR" className={fonte.variable}>
       <body>
-        <RegistrarServiceWorker />
+        <TarefasDeFundo />
         <Tranca>{children}</Tranca>
       </body>
     </html>

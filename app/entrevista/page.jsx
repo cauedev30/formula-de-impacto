@@ -10,6 +10,7 @@ import banco from "@/data/perguntas.json";
 import { obterEntrevista, salvarEntrevista } from "@/lib/db.mjs";
 import {
   agruparPorSecao,
+  idadeForaDaFaixa,
   limparOrfas,
   montarFormulario,
   progresso,
@@ -24,7 +25,10 @@ export default function Formulario() {
   // deixava a tela em branco para sempre quando o id não estava no aparelho.
   const [entrevista, setEntrevista] = useState(undefined);
   const [salvo, setSalvo] = useState(true);
+  const [falha, setFalha] = useState("");
   const primeiraCarga = useRef(true);
+  const ultimaRef = useRef(null);
+  const sujoRef = useRef(false);
 
   useEffect(() => {
     setId(new URLSearchParams(window.location.search).get("id"));
@@ -36,18 +40,44 @@ export default function Formulario() {
     else setEntrevista(null);
   }, [id]);
 
+  function salvar(e) {
+    return salvarEntrevista(e).then(
+      () => {
+        if (ultimaRef.current === e) sujoRef.current = false;
+        setSalvo(true);
+        setFalha("");
+      },
+      () => setFalha("não salvou no aparelho — não feche o app"),
+    );
+  }
+
   // Digitar dispara uma mudança por tecla; agrupar em 400 ms evita uma escrita por letra
   // sem arriscar o dado: qualquer pausa da mão já grava.
   useEffect(() => {
     if (!entrevista) return;
+    ultimaRef.current = entrevista;
     if (primeiraCarga.current) {
       primeiraCarga.current = false;
       return;
     }
+    sujoRef.current = true;
     setSalvo(false);
-    const timer = setTimeout(() => salvarEntrevista(entrevista).then(() => setSalvo(true)), 400);
+    const timer = setTimeout(() => salvar(entrevista), 400);
     return () => clearTimeout(timer);
   }, [entrevista]);
+
+  // Voltar ou fechar a aba dentro dos 400 ms cancelava o timer e a última resposta sumia.
+  useEffect(() => {
+    const salvarPendente = () => sujoRef.current && ultimaRef.current && salvar(ultimaRef.current);
+    const aoOcultar = () => document.visibilityState === "hidden" && salvarPendente();
+    window.addEventListener("pagehide", salvarPendente);
+    document.addEventListener("visibilitychange", aoOcultar);
+    return () => {
+      window.removeEventListener("pagehide", salvarPendente);
+      document.removeEventListener("visibilitychange", aoOcultar);
+      salvarPendente();
+    };
+  }, []);
 
   const perguntas = useMemo(
     () => (entrevista ? montarFormulario(banco, entrevista.perfil, entrevista.respostas) : []),
@@ -67,7 +97,12 @@ export default function Formulario() {
 
   async function concluir() {
     const concluida = { ...entrevista, concluidaEm: new Date().toISOString() };
-    await salvarEntrevista(concluida);
+    try {
+      await salvarEntrevista(concluida);
+    } catch {
+      return setFalha("não salvou no aparelho — não feche o app");
+    }
+    sujoRef.current = false;
     router.push(`/relatorio/?id=${entrevista.id}`);
   }
 
@@ -121,6 +156,11 @@ export default function Formulario() {
                       entrevistaId={entrevista.id}
                       aoResponder={responder}
                     />
+                    {pergunta.id === "idade" && idadeForaDaFaixa(entrevista.perfil, entrevista.respostas) && (
+                      <p className="aviso">
+                        Idade não bate com a faixa escolhida no início. Confira com o entrevistado.
+                      </p>
+                    )}
                   </div>
                 );
               })}
@@ -136,7 +176,7 @@ export default function Formulario() {
             <span style={{ width: `${total ? (feitas / total) * 100 : 0}%` }} />
           </div>
           <p className="discreto" style={{ margin: "6px 0 0" }}>
-            {feitas} de {total} · {salvo ? "salvo no aparelho" : "salvando…"}
+            {feitas} de {total} · {falha || (salvo ? "salvo no aparelho" : "salvando…")}
           </p>
         </div>
         <button type="button" className="botao" onClick={concluir} disabled={feitas === 0}>

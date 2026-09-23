@@ -4,7 +4,7 @@ import { useEffect, useRef, useState } from "react";
 
 import { novoId, obterAudio, salvarAudio } from "@/lib/db.mjs";
 import { FORMATOS } from "@/lib/formatos-audio.mjs";
-import { aoVoltarOnline, desenfileirar, enfileirar, transcrever } from "@/lib/transcrever.mjs";
+import { desenfileirar, enfileirar, juntarTranscricao, transcrever } from "@/lib/transcrever.mjs";
 import Icone from "./Icone";
 
 const formatoSuportado = () =>
@@ -20,6 +20,7 @@ export default function GravadorAudio({ entrevistaId, perguntaId, valor, aoGrava
   const [url, setUrl] = useState("");
   const [estado, setEstado] = useState("");
   const gravadorRef = useRef(null);
+  const inicioRef = useRef(0);
   const valorRef = useRef(valor);
   valorRef.current = valor;
 
@@ -44,7 +45,7 @@ export default function GravadorAudio({ entrevistaId, perguntaId, valor, aoGrava
     return () => clearInterval(timer);
   }, [gravando]);
 
-  async function transcreverAgora(audioId, duracao) {
+  async function transcreverAgora(audioId) {
     const audio = await obterAudio(audioId);
     if (!audio) return;
 
@@ -60,19 +61,31 @@ export default function GravadorAudio({ entrevistaId, perguntaId, valor, aoGrava
       desenfileirar(audioId);
       // A transcrição é rascunho e a gravação é o registro: o áudio continua salvo, e o
       // texto entra num campo que ele pode corrigir antes de fechar a entrevista.
-      aoGravar({ ...valorRef.current, audioId, duracao, texto, transcritoEm: new Date().toISOString() });
+      aoGravar(juntarTranscricao(valorRef.current, texto));
       setEstado("");
-    } catch {
+    } catch (falha) {
+      if (falha.definitivo) {
+        setEstado("");
+        return setErro(`Não deu para passar este áudio para texto: ${falha.message}`);
+      }
       enfileirar(entrevistaId, perguntaId, audioId);
       setEstado("sem sinal");
     }
   }
 
+  // A fila roda em TarefasDeFundo e já gravou no banco; aqui só a memória da tela é
+  // atualizada, senão o próximo save da página grava por cima sem o texto.
   useEffect(() => {
-    if (estado !== "sem sinal" || !valor?.audioId) return;
-    return aoVoltarOnline(() => transcreverAgora(valor.audioId, valor.duracao));
+    if (!valor?.audioId) return;
+    const aoTranscrever = ({ detail }) => {
+      if (detail.audioId !== valorRef.current?.audioId) return;
+      aoGravar(juntarTranscricao(valorRef.current, detail.texto));
+      setEstado("");
+    };
+    window.addEventListener("transcrito", aoTranscrever);
+    return () => window.removeEventListener("transcrito", aoTranscrever);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [estado, valor?.audioId]);
+  }, [valor?.audioId]);
 
   async function iniciar() {
     setErro("");
@@ -84,7 +97,7 @@ export default function GravadorAudio({ entrevistaId, perguntaId, valor, aoGrava
       gravador.ondataavailable = (evento) => evento.data.size && pedacos.push(evento.data);
       gravador.onstop = async () => {
         stream.getTracks().forEach((faixa) => faixa.stop());
-        const duracao = segundos;
+        const duracao = Math.round((Date.now() - inicioRef.current) / 1000);
         const id = novoId();
         await salvarAudio({
           id,
@@ -95,11 +108,12 @@ export default function GravadorAudio({ entrevistaId, perguntaId, valor, aoGrava
         });
         aoGravar({ ...valorRef.current, audioId: id, duracao });
         setGravando(false);
-        transcreverAgora(id, duracao);
+        transcreverAgora(id);
       };
       gravadorRef.current = gravador;
       setSegundos(0);
       gravador.start();
+      inicioRef.current = Date.now();
       setGravando(true);
     } catch {
       setErro("Não consegui acessar o microfone. Autorize o microfone para este site.");

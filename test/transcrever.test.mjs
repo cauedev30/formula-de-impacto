@@ -21,7 +21,14 @@ let temRede = true;
 Object.defineProperty(globalThis, "navigator", { value: { get onLine() { return temRede; } }, configurable: true });
 const disparar = (evento) => (ouvintes.get(evento) ?? []).forEach((fn) => fn());
 
-const { aoVoltarOnline, desenfileirar, enfileirar, pendentes } = await import("../lib/transcrever.mjs");
+const { aoVoltarOnline, desenfileirar, enfileirar, juntarTranscricao, pendentes, transcrever } = await import(
+  "../lib/transcrever.mjs"
+);
+
+const servidorResponde = (status, corpo) => {
+  globalThis.fetch = async () => new Response(JSON.stringify(corpo), { status });
+};
+const erroDe = (promessa) => promessa.then(() => assert.fail("devia falhar"), (erro) => erro);
 
 test("áudio gravado sem sinal fica anotado com a entrevista e a pergunta de origem", () => {
   armazem.clear();
@@ -69,4 +76,33 @@ test("evento online com o aparelho ainda sem rede não tenta transcrever", () =>
   disparar("online");
   assert.equal(rodou, 0);
   soltar();
+});
+
+test("transcrição entra depois do texto digitado, sem apagar o que estava escrito", () => {
+  const junto = juntarTranscricao({ audioId: "a1", texto: "anotei à mão" }, "falou do Pronaf");
+  assert.equal(junto.texto, "anotei à mão\n\nfalou do Pronaf");
+  assert.equal(junto.audioId, "a1");
+  assert.ok(junto.transcritoEm);
+});
+
+test("transcrição em resposta sem texto vira o próprio texto", () => {
+  assert.equal(juntarTranscricao({ audioId: "a1", texto: "  " }, "falou do Pronaf").texto, "falou do Pronaf");
+});
+
+test("áudio que o servidor recusa (422) é erro final e não volta para a fila", async () => {
+  servidorResponde(422, { erro: "Não saiu texto do áudio." });
+  const erro = await erroDe(transcrever(new Blob(["x"])));
+  assert.equal(erro.definitivo, true);
+  assert.equal(erro.message, "Não saiu texto do áudio.");
+});
+
+test("servidor fora (502), limite (429) e rede caída continuam na fila", async () => {
+  for (const status of [502, 429]) {
+    servidorResponde(status, {});
+    assert.equal((await erroDe(transcrever(new Blob(["x"])))).definitivo, false, String(status));
+  }
+  globalThis.fetch = async () => {
+    throw new TypeError("Failed to fetch");
+  };
+  assert.ok(!(await erroDe(transcrever(new Blob(["x"])))).definitivo);
 });

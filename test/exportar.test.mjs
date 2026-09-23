@@ -2,7 +2,9 @@ import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
 import test from "node:test";
 
-import { LEIAME, consolidar, montarCsv } from "../lib/exportar.mjs";
+import JSZip from "jszip";
+
+import { LEIAME, audiosDaResposta, consolidar, juntarEntrevistas, lerExportacao, montarCsv } from "../lib/exportar.mjs";
 import { EXTENSOES } from "../lib/formatos-audio.mjs";
 
 const banco = JSON.parse(readFileSync(new URL("../data/perguntas.json", import.meta.url)));
@@ -98,4 +100,32 @@ test("as instruções do ZIP varrem toda extensão que o gravador produz", () =>
       `o comando do LEIAME não varre .${extensao}, que é o que o Safari ou o Chrome gravam`,
     );
   }
+});
+
+test("ZIP leva só o áudio que a resposta aponta, não a gravação descartada", () => {
+  const e = entrevista("a", jovem, { jovem_uma_mudanca: { audioId: "novo" } });
+  const audios = [{ id: "velho", perguntaId: "jovem_uma_mudanca" }, { id: "novo", perguntaId: "jovem_uma_mudanca" }];
+  assert.deepEqual(audiosDaResposta(e, audios).map((a) => a.id), ["novo"]);
+});
+
+test("juntar entrevistas de outro aparelho não duplica por id e a local vence", () => {
+  const local = entrevista("a", jovem, { nome: "local" });
+  const juntas = juntarEntrevistas([local], [entrevista("a", jovem, { nome: "outro" }), entrevista("b", adulta, {})]);
+  assert.deepEqual(juntas.map((e) => e.id), ["a", "b"]);
+  assert.equal(juntas[0].respostas.nome, "local");
+});
+
+test("importar ZIP lê entrevistas.json e descarta item malformado", async () => {
+  const zip = new JSZip();
+  zip.file(
+    "entrevistas.json",
+    JSON.stringify({ banco: "1", entrevistas: [entrevista("a", jovem, {}), { id: 7, perfil: {} }, null, { id: "c" }] }),
+  );
+  const arquivo = new File([await zip.generateAsync({ type: "uint8array" })], "tablet2.zip");
+  assert.deepEqual((await lerExportacao(arquivo)).map((e) => e.id), ["a"]);
+});
+
+test("importar JSON solto também funciona", async () => {
+  const arquivo = new File([JSON.stringify({ entrevistas: [entrevista("a", jovem, {})] })], "entrevistas.json");
+  assert.equal((await lerExportacao(arquivo)).length, 1);
 });
