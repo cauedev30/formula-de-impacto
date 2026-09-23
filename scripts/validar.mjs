@@ -136,7 +136,7 @@ await cenario("2-montagem", async () => {
   checar("2-montagem: agricultora jovem recebe de 20 a 25 perguntas", jovem >= 20 && jovem <= 25, `${jovem} perguntas`);
   checar("2-montagem: perfil jovem recebe a pergunta de permanência no campo", temJuventude);
 
-  await abrirEntrevista(["Poder público", "Prefeito(a)"]);
+  await abrirEntrevista(["Poder público", "Prefeito(a)", "Homem"]);
   const prefeito = await contarCartoes();
   const tela = await textoDaTela();
   checar("2-montagem: prefeito recebe de 20 a 25 perguntas", prefeito >= 20 && prefeito <= 25, `${prefeito} perguntas`);
@@ -428,6 +428,72 @@ await cenario("10-resposta-escrita", async () => {
   const ficha = await textoDaTela();
   const achou = ficha.includes("Precisaria de estrada melhor para escoar a produção.");
   checar("10-resposta-escrita: a ficha imprime o texto, não \"não respondida\"", achou);
+});
+
+// ---------------------------------------------------------------------------
+
+const respostaGravada = async () => {
+  const id = await js(`return new URLSearchParams(location.search).get("id");`);
+  const respostas = (await respostasGravadas())?.find((e) => e.id === id)?.respostas ?? {};
+  return { id, valor: Object.values(respostas).find((r) => r?.audioId) };
+};
+
+// A duração vinha do estado preso no closure de quando a gravação começou: 0 na primeira,
+// e a da gravação anterior no "Gravar de novo".
+await cenario("11-duracao", async () => {
+  await abrirEntrevista(["Agricultor(a) familiar", "Adulto", "Homem"]);
+  await rede(true);
+  await gravar(6);
+  await ate(async () => Boolean((await respostaGravada()).valor), 15);
+  const primeira = (await respostaGravada()).valor?.duracao;
+  checar("11-duracao: primeira gravação guarda a duração real", primeira >= 5 && primeira <= 8, `${primeira} s`);
+
+  await gravar(3);
+  const antigo = (await respostaGravada()).valor?.audioId;
+  await ate(async () => (await respostaGravada()).valor?.duracao !== primeira, 15);
+  const segunda = (await respostaGravada()).valor?.duracao;
+  checar("11-duracao: regravar guarda a duração nova, não a anterior", segunda >= 2 && segunda <= 5, `${segunda} s, antes ${primeira} s (${antigo})`);
+  await rede(false);
+});
+
+// ---------------------------------------------------------------------------
+
+// A fila só andava com o gravador daquela pergunta montado. Recarregar e sair da entrevista
+// deixava o áudio pendente para sempre.
+await cenario("12-fila-recarregada", async () => {
+  await abrirEntrevista(["Agricultor(a) familiar", "Adulto", "Homem"]);
+  await js(`localStorage.removeItem("transcricoes-pendentes"); return true;`);
+  await rede(true);
+  await gravar(8);
+  const anotou = await ate(async () => (await filaPendente()).length === 1, 20);
+  checar("12-fila-recarregada: sem sinal, o áudio entra na fila", anotou);
+  const { id } = await respostaGravada();
+
+  await rede(false);
+  await irPara("/");
+  const esvaziou = await ate(async () => (await filaPendente()).length === 0, 90, 2000);
+  checar("12-fila-recarregada: fora da entrevista, a fila esvazia sozinha", esvaziou);
+  const texto = await ate(async () => {
+    const entrevista = (await respostasGravadas())?.find((e) => e.id === id);
+    return Object.values(entrevista?.respostas ?? {}).some((r) => r?.audioId && (r.texto ?? "").length > 10);
+  }, 10);
+  checar("12-fila-recarregada: o texto chega na resposta gravada no aparelho", texto);
+});
+
+// ---------------------------------------------------------------------------
+
+// Fica por último: o limite dura um minuto e derrubaria as transcrições dos outros cenários.
+await cenario("13-limite", async () => {
+  await irPara("/");
+  const status = await js(`
+    const lista = [];
+    for (let i = 0; i < 25; i++) {
+      const r = await fetch("${BASE}/api/transcrever", { method: "POST", body: new Blob([]) });
+      lista.push(r.status);
+    }
+    return lista;
+  `);
+  checar("13-limite: rajada de pedidos do mesmo IP recebe 429", status.includes(429), status.join(","));
 });
 
 // ---------------------------------------------------------------------------

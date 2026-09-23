@@ -8,8 +8,8 @@ Funciona sem sinal de celular: é onde a entrevista acontece.
 
 ```
 $ npm test
-# tests 31
-# pass 31
+# tests 43
+# pass 43
 # fail 0
 
 $ npm run validar
@@ -30,7 +30,7 @@ erro geral: 4.6% em 690 palavras
 | Banco de perguntas com tags de perfil | `data/perguntas.json` |
 | Montagem do formulário a partir do perfil | `lib/montar-formulario.mjs` |
 | Persistência local (IndexedDB) | `lib/db.mjs` |
-| Gravação de áudio e fila de transcrição | `components/GravadorAudio.jsx`, `lib/transcrever.mjs` |
+| Gravação de áudio e fila de transcrição | `components/GravadorAudio.jsx`, `lib/transcrever.mjs`, `components/TarefasDeFundo.jsx` |
 | Exportação em ZIP e consolidado | `lib/exportar.mjs` |
 | Funcionamento offline | `public/sw.js` |
 
@@ -57,7 +57,7 @@ Rodar Whisper dentro do navegador foi tentado e descartado: o Safari não libera
 esquenta o aparelho — com qualidade pior, porque só um modelo pequeno cabe.
 
 Sem sinal a gravação fica anotada como pendente e a transcrição acontece sozinha quando a internet
-volta. O ZIP exportado traz os áudios originais de qualquer forma, e o `LEIAME.txt` de dentro dele
+volta, em qualquer tela do app. O texto entra depois do que já estava digitado, sem apagar. O ZIP exportado traz os áudios originais de qualquer forma, e o `LEIAME.txt` de dentro dele
 tem o comando para refazer tudo no computador com o `vox`.
 
 ### Medir a qualidade da transcrição
@@ -117,3 +117,7 @@ npm run validar      # bateria funcional contra produção (precisa de Chrome co
 npx wrangler login
 npm run deploy
 ```
+
+## Licença
+
+MIT, em `LICENSE`. O nome e a marca CAIXA não estão cobertos pela licença do código.

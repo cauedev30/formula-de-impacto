@@ -12,3 +12,4 @@ video/public/telas/
 video/public/narracao/
 video/.narracoes/
 .kokoro/
+.wrangler/
