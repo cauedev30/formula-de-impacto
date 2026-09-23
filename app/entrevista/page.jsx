@@ -29,6 +29,7 @@ export default function Formulario() {
   const primeiraCarga = useRef(true);
   const ultimaRef = useRef(null);
   const sujoRef = useRef(false);
+  const timerRef = useRef(null);
 
   useEffect(() => {
     setId(new URLSearchParams(window.location.search).get("id"));
@@ -62,8 +63,8 @@ export default function Formulario() {
     }
     sujoRef.current = true;
     setSalvo(false);
-    const timer = setTimeout(() => salvar(entrevista), 400);
-    return () => clearTimeout(timer);
+    timerRef.current = setTimeout(() => salvar(entrevista), 400);
+    return () => clearTimeout(timerRef.current);
   }, [entrevista]);
 
   // Voltar ou fechar a aba dentro dos 400 ms cancelava o timer e a última resposta sumia.
@@ -96,6 +97,8 @@ export default function Formulario() {
   }
 
   async function concluir() {
+    // O timer pendente gravaria por cima a versão sem concluidaEm.
+    clearTimeout(timerRef.current);
     const concluida = { ...entrevista, concluidaEm: new Date().toISOString() };
     try {
       await salvarEntrevista(concluida);

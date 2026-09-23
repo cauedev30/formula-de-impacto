@@ -122,9 +122,10 @@ export default function Inicio() {
   async function exportar() {
     setExportando(true);
     try {
-      const { blob, total } = await montarZip(banco);
-      baixar(blob, `entrevistas-${new Date().toISOString().slice(0, 10)}-${total}.zip`);
+      // Antes do ZIP: o que a fila gravar durante a montagem não está nele e tem que contar.
       const agora = new Date().toISOString();
+      const { blob, total } = await montarZip(banco);
+      baixar(blob, `entrevistas-${agora.slice(0, 10)}-${total}.zip`);
       try {
         localStorage.setItem(EXPORTADO, agora);
       } catch {

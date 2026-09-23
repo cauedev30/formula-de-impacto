@@ -4,7 +4,7 @@ import { useEffect, useRef, useState } from "react";
 
 import { novoId, obterAudio, salvarAudio } from "@/lib/db.mjs";
 import { FORMATOS } from "@/lib/formatos-audio.mjs";
-import { desenfileirar, enfileirar, juntarTranscricao, transcrever } from "@/lib/transcrever.mjs";
+import { desenfileirar, enfileirar, juntarTranscricao, semTranscricaoAntiga, transcrever } from "@/lib/transcrever.mjs";
 import Icone from "./Icone";
 
 const formatoSuportado = () =>
@@ -59,6 +59,7 @@ export default function GravadorAudio({ entrevistaId, perguntaId, valor, aoGrava
     try {
       const texto = await transcrever(audio.blob);
       desenfileirar(audioId);
+      if (valorRef.current?.audioId !== audioId) return;
       // A transcrição é rascunho e a gravação é o registro: o áudio continua salvo, e o
       // texto entra num campo que ele pode corrigir antes de fechar a entrevista.
       aoGravar(juntarTranscricao(valorRef.current, texto));
@@ -106,7 +107,7 @@ export default function GravadorAudio({ entrevistaId, perguntaId, valor, aoGrava
           blob: new Blob(pedacos, { type: gravador.mimeType }),
           extensao: formato.extensao,
         });
-        aoGravar({ ...valorRef.current, audioId: id, duracao });
+        aoGravar({ ...semTranscricaoAntiga(valorRef.current), audioId: id, duracao });
         setGravando(false);
         transcreverAgora(id);
       };

@@ -21,7 +21,7 @@ let temRede = true;
 Object.defineProperty(globalThis, "navigator", { value: { get onLine() { return temRede; } }, configurable: true });
 const disparar = (evento) => (ouvintes.get(evento) ?? []).forEach((fn) => fn());
 
-const { aoVoltarOnline, desenfileirar, enfileirar, juntarTranscricao, pendentes, transcrever } = await import(
+const { aoVoltarOnline, desenfileirar, enfileirar, juntarTranscricao, pendentes, semTranscricaoAntiga, transcrever } = await import(
   "../lib/transcrever.mjs"
 );
 
@@ -96,8 +96,8 @@ test("áudio que o servidor recusa (422) é erro final e não volta para a fila"
   assert.equal(erro.message, "Não saiu texto do áudio.");
 });
 
-test("servidor fora (502), limite (429) e rede caída continuam na fila", async () => {
-  for (const status of [502, 429]) {
+test("servidor fora (502), limite (429), proxy (403) e rede caída continuam na fila", async () => {
+  for (const status of [502, 429, 403, 404]) {
     servidorResponde(status, {});
     assert.equal((await erroDe(transcrever(new Blob(["x"])))).definitivo, false, String(status));
   }
@@ -105,4 +105,21 @@ test("servidor fora (502), limite (429) e rede caída continuam na fila", async 
     throw new TypeError("Failed to fetch");
   };
   assert.ok(!(await erroDe(transcrever(new Blob(["x"])))).definitivo);
+});
+
+test("portal de wifi que responde 200 sem texto não vira transcrição", async () => {
+  globalThis.fetch = async () => new Response("<html>login</html>", { status: 200 });
+  const erro = await erroDe(transcrever(new Blob(["x"])));
+  assert.ok(!erro.definitivo);
+});
+
+test("regravar tira a transcrição antiga e mantém o que foi digitado", () => {
+  const valor = juntarTranscricao({ audioId: "a1", texto: "anotei à mão" }, "falou do Pronaf");
+  assert.equal(semTranscricaoAntiga(valor).texto, "anotei à mão");
+  assert.equal(semTranscricaoAntiga(valor).transcritoEm, undefined);
+});
+
+test("regravar não mexe em transcrição que já foi corrigida", () => {
+  const valor = { ...juntarTranscricao({ audioId: "a1" }, "falou do Punaf"), texto: "falou do Pronaf" };
+  assert.equal(semTranscricaoAntiga(valor).texto, "falou do Pronaf");
 });
